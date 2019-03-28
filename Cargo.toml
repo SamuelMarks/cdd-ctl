@@ -1,7 +1,12 @@
 [package]
-name = "cdd-ctl"
+name = "cdd"
 version = "0.1.0"
-authors = ["Samuel Marks <samuelmarks@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+structopt = "0.2"
+
+[lib]
+
+[[bin]]
+name = "cdd"
