@@ -1,3 +1,1 @@
-cdd-ctl
-=======
-Compiler-driven development CLI
+# Compiler Driven Development
