@@ -3,6 +3,7 @@ use structopt::StructOpt;
 
 /// Compiler driven development cli tool
 #[derive(StructOpt, Debug)]
+#[structopt(raw(setting = "structopt::clap::AppSettings::ColoredHelp"))]
 #[structopt(name = "cdd")]
 struct Opt {
     // The number of occurrences of the `v/verbose` flag
