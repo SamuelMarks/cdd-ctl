@@ -1,5 +1,6 @@
 [package]
 name = "cdd"
+authors = ["Rob Saunders <rob@wearebrandnew.com>"]
 version = "0.1.0"
 edition = "2018"
 
