@@ -6,6 +6,7 @@ pub type CliResult<T> = Result<T, Box<std::error::Error>>;
 #[derive(Debug, Clone)]
 pub enum CliError {
     ArgumentError(String),
+    ConfigError(String),
 }
 
 impl fmt::Display for CliError {
