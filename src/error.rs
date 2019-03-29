@@ -13,6 +13,7 @@ impl fmt::Display for CliError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self.clone() {
             CliError::ArgumentError(why) => write!(f, "ArgumentError: {}", why),
+            CliError::ConfigError(why) => write!(f, "ConfigError: {}", why),
         }
     }
 }

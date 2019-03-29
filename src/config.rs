@@ -19,7 +19,7 @@ impl Config {
         // if a config file location was provided,
         if let Some(file) = file {
             // read the file into a string
-            file_contents = file.into_os_string().into_string().map_err(|_| {
+            file_contents = file.clone().into_os_string().into_string().map_err(|_| {
                 CliError::ConfigError(format!(
                     "cannot read configuaration file: {}",
                     file.display()
@@ -30,7 +30,17 @@ impl Config {
             let search_paths: Vec<PathBuf> = vec![PathBuf::from(r"./config.yaml")];
 
             if let Some(valid_path) = search_paths.into_iter().find(|p| p.exists()) {
-                let file_contents = valid_path.into_os_string().into_string();
+                file_contents =
+                    valid_path
+                        .clone()
+                        .into_os_string()
+                        .into_string()
+                        .map_err(|_| {
+                            CliError::ConfigError(format!(
+                                "cannot read configuaration file: {}",
+                                valid_path.display()
+                            ))
+                        })?;
             } else {
                 return Err(Box::new(CliError::ConfigError("bad files".to_string())));
             }
