@@ -1,10 +1,19 @@
 use crate::error::*;
 use dirs;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::path::PathBuf;
 
 /// search path locations
 pub static CONFIG_SEARCH_PATHS: [&str; 1] = [r"./config.yaml"];
+
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
+pub struct Component {
+    tests: bool,
+    routes: bool,
+    validation: bool,
+    models: bool,
+}
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct Config {
@@ -12,6 +21,9 @@ pub struct Config {
     version: String,
     description: String,
     author: String,
+    openapi: String,
+    auth: String,
+    components: HashMap<String, Component>,
 }
 
 impl Config {
@@ -41,6 +53,12 @@ impl Config {
             }
         }
 
+        println!("reading: {:#?}", file_contents.clone());
+        println!(
+            "yaml: {:#?}",
+            serde_yaml::from_str::<Config>(&file_contents)
+        );
+
         // attempt to deserialise it
         Ok(serde_yaml::from_str(&file_contents)?)
     }
@@ -60,24 +78,46 @@ impl Config {
 
 impl Default for Config {
     fn default() -> Self {
+        let mut components = HashMap::new();
+        components.insert(
+            "todo_list".to_string(),
+            Component {
+                tests: true,
+                routes: true,
+                validation: true,
+                models: true,
+            },
+        );
+        components.insert(
+            "messaging".to_string(),
+            Component {
+                tests: true,
+                routes: true,
+                validation: true,
+                models: true,
+            },
+        );
+
         Config {
             name: "default project".to_string(),
             version: "0.0.1".to_string(),
             description: "description".to_string(),
             author: "me@me.com".to_string(),
+            openapi: "openapi.yaml".to_string(),
+            auth: "rfc6749".to_string(),
+            components,
         }
     }
 }
 
 fn pathbuf_to_string(pathbuf: PathBuf) -> CliResult<String> {
-    Ok(pathbuf
-        .clone()
-        .into_os_string()
-        .into_string()
-        .map_err(|_| {
-            CliError::ConfigError(format!(
-                "cannot read configuaration file: {}",
-                pathbuf.display()
-            ))
-        })?)
+    use std::fs::File;
+    use std::io::prelude::*;
+
+    let mut f = File::open(pathbuf)?;
+    let mut buffer = String::new();
+
+    f.read_to_string(&mut buffer)?;
+
+    Ok(buffer)
 }

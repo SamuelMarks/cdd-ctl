@@ -28,12 +28,17 @@ struct Opt {
     // #[structopt(name = "command")]
     // command: Command,
     /// Initialises a new configuration file.
-    #[structopt(help = "Initialise a new project")]
+    #[structopt(short = "i", long = "init", help = "Initialise a new project")]
     init: bool,
 }
 
 pub fn run() -> CliResult<String> {
     let opt = Opt::from_args();
+    if opt.init {
+        println!("initialising new config...");
+        Config::default().write(PathBuf::from(r"./config.yaml"))?;
+    }
+
     let config = Config::read(opt.config);
 
     Ok(format!("{:?}", config))
