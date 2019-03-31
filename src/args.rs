@@ -3,13 +3,6 @@ use crate::error::CliResult;
 use std::path::PathBuf;
 use structopt::StructOpt;
 
-// #[derive(StructOpt, Debug)]
-// #[structopt(name = "command")]
-// enum Command {
-//     #[structopt(name = "init")]
-//     Init,
-// }
-
 /// Compiler driven development cli tool
 #[derive(StructOpt, Debug)]
 #[structopt(raw(setting = "structopt::clap::AppSettings::ColoredHelp"))]
@@ -24,9 +17,6 @@ struct Opt {
     #[structopt(help = "Config file location", parse(from_os_str), name = "config")]
     config: Option<PathBuf>,
 
-    // /// Main set of command directives.
-    // #[structopt(name = "command")]
-    // command: Command,
     /// Initialises a new configuration file.
     #[structopt(short = "i", long = "init", help = "Initialise a new project")]
     init: bool,
