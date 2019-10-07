@@ -1,4 +1,5 @@
 use crate::error::*;
+use crate::services::*;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::PathBuf;
@@ -14,7 +15,7 @@ pub struct Component {
     models: bool,
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Serialize, Deserialize)]
 pub struct Config {
     name: String,
     version: String,
@@ -22,7 +23,7 @@ pub struct Config {
     author: String,
     openapi: String,
     auth: String,
-    components: HashMap<String, Component>,
+    services: HashMap<String, CDDService>,
 }
 
 impl Config {
@@ -52,11 +53,11 @@ impl Config {
             }
         }
 
-        println!("reading: {:#?}", file_contents.clone());
-        println!(
-            "yaml: {:#?}",
-            serde_yaml::from_str::<Config>(&file_contents)
-        );
+        // println!("reading: {:#?}", file_contents.clone());
+        // println!(
+        //     "yaml: {:#?}",
+        //     serde_yaml::from_str::<Config>(&file_contents)
+        // );
 
         // attempt to deserialise it
         Ok(serde_yaml::from_str(&file_contents)?)
@@ -69,7 +70,7 @@ impl Config {
         let yaml = serde_yaml::to_string(&self)?;
         let mut output = File::create(path)?;
 
-        write!(output, "{}", yaml)?;
+        write!(output, "{}\n", yaml)?;
 
         Ok(())
     }
@@ -77,23 +78,11 @@ impl Config {
 
 impl Default for Config {
     fn default() -> Self {
-        let mut components = HashMap::new();
-        components.insert(
-            "todo_list".to_string(),
-            Component {
-                tests: true,
-                routes: true,
-                validation: true,
-                models: true,
-            },
-        );
-        components.insert(
-            "messaging".to_string(),
-            Component {
-                tests: true,
-                routes: true,
-                validation: true,
-                models: true,
+        let mut services = HashMap::new();
+        services.insert(
+            "swift".to_string(),
+            CDDService {
+                bin_path: "services/cdd-swift".to_string(),
             },
         );
 
@@ -104,7 +93,7 @@ impl Default for Config {
             author: "me@me.com".to_string(),
             openapi: "openapi.yaml".to_string(),
             auth: "rfc6749".to_string(),
-            components,
+            services,
         }
     }
 }

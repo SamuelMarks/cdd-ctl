@@ -5,13 +5,9 @@ pub type CliResult<T> = Result<T, failure::Error>;
 #[derive(Debug, Fail)]
 pub enum CliError {
     #[fail(display = "invalid argument: {}", arg)]
-    InvalidArgument {
-        arg: String,
-    },
+    InvalidArgument { arg: String },
     #[fail(display = "reading config: {}", msg)]
-    InvalidConfig {
-        msg: String,
-    }
+    InvalidConfig { msg: String },
 }
 
 // use core::fmt;
