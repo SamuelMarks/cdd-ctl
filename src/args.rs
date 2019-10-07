@@ -1,5 +1,5 @@
 use crate::config::Config;
-use crate::error::CliResult;
+use crate::CliResult;
 use std::path::PathBuf;
 use structopt::StructOpt;
 
