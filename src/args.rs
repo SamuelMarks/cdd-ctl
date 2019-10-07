@@ -1,5 +1,5 @@
 use crate::config::Config;
-use crate::CliResult;
+use crate::{CliResult, logger};
 use std::path::PathBuf;
 use structopt::StructOpt;
 
@@ -41,7 +41,10 @@ pub fn run() -> CliResult<String> {
     //     Config::default().write(PathBuf::from(r"./config.yaml"))?;
     // }
 
-    let config = Config::read(opt.config);
+    logger::start_logger(opt.verbose, false);
+
+    let config = Config::read(opt.config)?;
+    log::info!("Successfully read configuration file.");
 
     match opt.cmd {
         Command::Init => crate::commands::init(),

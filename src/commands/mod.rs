@@ -1,12 +1,11 @@
 use crate::*;
-
-pub fn init() -> CliResult<String> {
-    Ok("init".to_string())
-}
+mod init;
+pub use init::*;
 
 pub fn regenerate() -> CliResult<String> {
     Ok("regenerate".to_string())
 }
+
 pub fn sync() -> CliResult<String> {
     Ok("sync".to_string())
 }

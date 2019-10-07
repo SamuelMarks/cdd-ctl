@@ -12,6 +12,7 @@ serde_yaml = "0.8"
 dirs = "1.0"
 colored = "1.7"
 log = "0.4"
+simplelog = "0.7.3"
 failure = "0.1.5"
 
 [lib]
