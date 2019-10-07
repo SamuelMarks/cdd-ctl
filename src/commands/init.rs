@@ -7,5 +7,5 @@ use log::*;
 use crate::*;
 
 pub fn init() -> CliResult<String> {
-    Ok("init".tostring())
+    Ok("init".to_string())
 }
