@@ -1,8 +1,8 @@
 mod args;
 mod config;
 mod error;
-mod init;
 mod stdout;
+mod commands;
 
 pub use self::args::run;
 pub use self::error::CliError;
