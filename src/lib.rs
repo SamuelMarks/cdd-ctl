@@ -1,9 +1,10 @@
 mod args;
+mod commands;
 mod config;
 mod error;
-mod commands;
 mod logger;
 mod services;
+mod util;
 
 pub use self::args::run;
 pub use self::error::CliError;

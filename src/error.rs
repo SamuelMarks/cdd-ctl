@@ -1,37 +1,27 @@
-use failure::Fail;
+use failure::{Context, Error, Fail};
 
-pub type CliResult<T> = Result<T, failure::Error>;
+pub type CliResult<T> = Result<T, Error>;
 
 #[derive(Debug, Fail)]
 pub enum CliError {
+    #[fail(display = "error initialising new project: {}", arg)]
+    InitError { arg: String },
+
     #[fail(display = "invalid argument: {}", arg)]
     InvalidArgument { arg: String },
+
     #[fail(display = "reading config: {}", msg)]
     InvalidConfig { msg: String },
+
+    #[fail(display = "IO error: {}", error)]
+    IoError { error: std::io::Error },
+
+    #[fail(display = "An unknown error has occurred.")]
+    UnknownError,
 }
 
-// use core::fmt;
-// use std::error::Error;
-
-// pub type CliResult<T> = Result<T, Box<dyn std::error::Error>>;
-
-// #[derive(Debug, Clone)]
-// pub enum CliError {
-//     ArgumentError(String),
-//     ConfigError(String),
-// }
-
-// impl fmt::Display for CliError {
-//     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-//         match self.clone() {
-//             CliError::ArgumentError(why) => write!(f, "ArgumentError: {}", why),
-//             CliError::ConfigError(why) => write!(f, "ConfigError: {}", why),
-//         }
-//     }
-// }
-
-// impl Error for CliError {
-//     fn description(&self) -> &str {
-//         "Cli Error."
+// impl std::convert::From<std::io::Error> for CliError {
+//     fn from(error: io::Error) -> Self {
+//         CliError::IoError(error)
 //     }
 // }

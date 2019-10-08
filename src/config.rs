@@ -28,38 +28,8 @@ pub struct Config {
 
 impl Config {
     /// Read a configuration file from an optional location, or try several default locations.
-    pub fn read(file: Option<PathBuf>) -> CliResult<Self> {
-        let file_contents: String;
-
-        // if a config file location was provided,
-        if let Some(file) = file {
-            // read the file into a string
-            file_contents = pathbuf_to_string(file)?;
-        } else {
-            // otherwise search predetermined locations
-            let search_paths: Vec<PathBuf> = CONFIG_SEARCH_PATHS
-                .iter()
-                .map(|sp| PathBuf::from(sp))
-                .collect();
-
-            // find the first valid entry in the array
-            if let Some(valid_path) = search_paths.into_iter().find(|p| p.exists()) {
-                file_contents = pathbuf_to_string(valid_path)?;
-            } else {
-                // no files were found, so attempt to create a default in the default global configuration.
-                let config = Config::default();
-                config.write(PathBuf::from(r"./config.yaml"))?;
-                return Ok(config);
-            }
-        }
-
-        // println!("reading: {:#?}", file_contents.clone());
-        // println!(
-        //     "yaml: {:#?}",
-        //     serde_yaml::from_str::<Config>(&file_contents)
-        // );
-
-        // attempt to deserialise it
+    pub fn read(file: PathBuf) -> CliResult<Self> {
+        let file_contents: String = pathbuf_to_string(file)?;
         Ok(serde_yaml::from_str(&file_contents)?)
     }
 

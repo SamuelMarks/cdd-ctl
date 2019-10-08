@@ -1,17 +1,29 @@
 use crate::config::Config;
-use crate::{CliResult, logger};
+use crate::{logger, CliResult};
 use std::path::PathBuf;
 use structopt::StructOpt;
 
 #[derive(StructOpt, Debug)]
 enum Command {
-    #[structopt(name = "init", about = "Initializes a new project configuration file and OpenAPI spec")]
-    Init,
+    #[structopt(
+        name = "init",
+        about = "Initializes a new project configuration file and OpenAPI spec"
+    )]
+    Init {
+        #[structopt(help = "", parse(from_os_str), name = "config")]
+        path: PathBuf,
+    },
 
-    #[structopt(name = "regenerate", about = "Regenerates templates (warning: overwrites existing templates)")]
+    #[structopt(
+        name = "regenerate",
+        about = "Regenerates templates (warning: overwrites existing templates)"
+    )]
     Regenerate,
 
-    #[structopt(name = "sync", about = "Syncs CDD projects using language-specific adaptors")]
+    #[structopt(
+        name = "sync",
+        about = "Syncs CDD projects using language-specific adaptors"
+    )]
     Sync,
 }
 
@@ -20,7 +32,6 @@ enum Command {
 #[structopt(raw(setting = "structopt::clap::AppSettings::ColoredHelp"))]
 #[structopt(name = "cdd")]
 struct Opt {
-
     #[structopt(subcommand)]
     cmd: Command,
 
@@ -34,20 +45,20 @@ struct Opt {
     config: Option<PathBuf>,
 }
 
-pub fn run() -> CliResult<String> {
+pub fn run() -> CliResult<()> {
     let opt = Opt::from_args();
     // if opt.init {
     //     println!("initialising new config...");
     //     Config::default().write(PathBuf::from(r"./config.yaml"))?;
     // }
 
-    logger::start_logger(opt.verbose, false);
+    let _ = logger::start_logger(opt.verbose, false);
 
-    let config = Config::read(opt.config)?;
-    log::info!("Successfully read configuration file.");
+    // // let _config = Config::read(opt.config)?;
+    // log::info!("Successfully read configuration file.");
 
     match opt.cmd {
-        Command::Init => crate::commands::init(),
+        Command::Init { path } => crate::commands::init(path),
         Command::Regenerate => crate::commands::regenerate(),
         Command::Sync => crate::commands::sync(),
     }

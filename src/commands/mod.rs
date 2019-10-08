@@ -1,11 +1,6 @@
-use crate::*;
 mod init;
 pub use init::*;
-
-pub fn regenerate() -> CliResult<String> {
-    Ok("regenerate".to_string())
-}
-
-pub fn sync() -> CliResult<String> {
-    Ok("sync".to_string())
-}
+mod regenerate;
+pub use regenerate::*;
+mod sync;
+pub use sync::*;

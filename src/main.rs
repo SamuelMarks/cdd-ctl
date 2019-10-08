@@ -3,7 +3,7 @@ use log::*;
 fn main() {
     let result = cdd::run();
     match result {
-        Ok(msg) => info!("{}", msg),
+        Ok(_) => (),
         Err(err) => error!("{}", err),
     };
 }
