@@ -50,9 +50,11 @@ impl Default for Config {
     fn default() -> Self {
         let mut services = HashMap::new();
         services.insert(
-            "swift".to_string(),
+            "rust".to_string(),
             CDDService {
-                bin_path: "services/cdd-swift".to_string(),
+                bin_path: "~/.cdd/services/cdd-rust".to_string(),
+                template_path: "~/.cdd/rust".to_string(),
+                project_path: "./rust".to_string(),
             },
         );
 
