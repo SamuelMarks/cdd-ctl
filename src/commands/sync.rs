@@ -54,22 +54,11 @@ fn load_config_file() -> CliResult<config::Config> {
 }
 
 fn load_openapi_spec() -> CliResult<()> {
-    let spec_path: PathBuf = dirs::home_dir()
-        .ok_or(failure::format_err!("config.yml already exists."))
-        .and_then(|mut path| {
-            path.push("/.cdd/openapi.yml");
-            Ok(path)
-        })?;
+    let spec_path: PathBuf = PathBuf::from("openapi.yml");
 
     if !spec_path.exists() {
-        return Err(failure::format_err!(
-            "Could not find {}",
-            spec_path.to_str().unwrap_or("")
-        ));
+        return Err(failure::format_err!("Could not find openapi.yml"));
     };
-
-    let _ = util::copy_file(spec_path, PathBuf::from("./openapi.yml"));
-    info!("Copied OpenAPI spec to ./openapi.yml");
 
     Ok(())
 }
