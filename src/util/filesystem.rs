@@ -1,5 +1,15 @@
 use crate::*;
+use std::fs;
 use std::path::{Path, PathBuf};
+
+// pub fn home_dir() -> CliResult<String> {
+//     Ok(dirs::home_dir()
+//         .ok_or(|_| failure::format_err!("config.yml already exists."))?
+//         .into_os_string()
+//         .into_string()
+//         .map_err(|_| failure::format_err!("config.yml already exists."))?)
+//     dirs::home_dir()
+// }
 
 pub fn file_search(filename: &str, pwd: bool, home: bool) -> Option<String> {
     let mut paths: Vec<PathBuf> = vec![];
@@ -34,6 +44,14 @@ pub fn read_file(pathbuf: PathBuf) -> CliResult<String> {
     f.read_to_string(&mut buffer)?;
 
     Ok(buffer)
+}
+
+pub fn copy_file<F: AsRef<Path>, T: AsRef<Path>>(from: F, to: T) -> CliResult<()> {
+    Ok(fs::copy(from, to).map(|_| ())?)
+}
+
+pub fn copy_files_recursively(pathbuf: PathBuf) -> CliResult<()> {
+    Ok(())
 }
 
 #[test]

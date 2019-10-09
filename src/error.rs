@@ -1,4 +1,4 @@
-use failure::{Context, Error, Fail};
+use failure::{Error, Fail};
 
 pub type CliResult<T> = Result<T, Error>;
 
@@ -19,9 +19,3 @@ pub enum CliError {
     #[fail(display = "An unknown error has occurred.")]
     UnknownError,
 }
-
-// impl std::convert::From<std::io::Error> for CliError {
-//     fn from(error: io::Error) -> Self {
-//         CliError::IoError(error)
-//     }
-// }

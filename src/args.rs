@@ -1,4 +1,3 @@
-use crate::config::Config;
 use crate::{logger, CliResult};
 use std::path::PathBuf;
 use structopt::StructOpt;

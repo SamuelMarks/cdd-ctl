@@ -1,11 +1,9 @@
 use crate::error::*;
 use crate::services::*;
+use crate::util;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::PathBuf;
-
-/// search path locations
-pub static CONFIG_SEARCH_PATHS: [&str; 1] = [r"./config.yaml"];
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct Component {
@@ -29,7 +27,7 @@ pub struct Config {
 impl Config {
     /// Read a configuration file from an optional location, or try several default locations.
     pub fn read(file: PathBuf) -> CliResult<Self> {
-        let file_contents: String = pathbuf_to_string(file)?;
+        let file_contents: String = util::read_file(file)?;
         Ok(serde_yaml::from_str(&file_contents)?)
     }
 
@@ -68,16 +66,4 @@ impl Default for Config {
             services,
         }
     }
-}
-
-fn pathbuf_to_string(pathbuf: PathBuf) -> CliResult<String> {
-    use std::fs::File;
-    use std::io::prelude::*;
-
-    let mut f = File::open(pathbuf)?;
-    let mut buffer = String::new();
-
-    f.read_to_string(&mut buffer)?;
-
-    Ok(buffer)
 }
