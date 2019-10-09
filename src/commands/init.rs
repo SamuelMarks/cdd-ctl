@@ -29,10 +29,7 @@ fn copy_openapi_spec() -> CliResult<()> {
         .ok_or(failure::format_err!(
             "There was a problem locating your home directory."
         ))
-        .and_then(|mut path| {
-            path.push("/.cdd/openapi.yml");
-            Ok(path)
-        })?;
+        .map(|path| path.join(".cdd/openapi.yml"))?;
 
     if !spec_path.exists() {
         return Err(failure::format_err!(
