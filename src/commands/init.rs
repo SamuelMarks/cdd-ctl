@@ -26,7 +26,9 @@ fn init_config_file() -> CliResult<()> {
 
 fn copy_openapi_spec() -> CliResult<()> {
     let spec_path: PathBuf = dirs::home_dir()
-        .ok_or(failure::format_err!("config.yml already exists."))
+        .ok_or(failure::format_err!(
+            "There was a problem locating your home directory."
+        ))
         .and_then(|mut path| {
             path.push("/.cdd/openapi.yml");
             Ok(path)
