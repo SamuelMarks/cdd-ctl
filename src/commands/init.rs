@@ -35,7 +35,10 @@ fn copy_openapi_spec() -> CliResult<()> {
         })?;
 
     if !spec_path.exists() {
-        return Err(failure::format_err!("{}", spec_path.to_str().unwrap_or("")));
+        return Err(failure::format_err!(
+            "Could not find spec file at ~{}",
+            spec_path.to_str().unwrap_or("")
+        ));
     };
 
     let _ = util::copy_file(spec_path, PathBuf::from("./openapi.yml"));

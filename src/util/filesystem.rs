@@ -2,15 +2,6 @@ use crate::*;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-// pub fn home_dir() -> CliResult<String> {
-//     Ok(dirs::home_dir()
-//         .ok_or(|_| failure::format_err!("config.yml already exists."))?
-//         .into_os_string()
-//         .into_string()
-//         .map_err(|_| failure::format_err!("config.yml already exists."))?)
-//     dirs::home_dir()
-// }
-
 pub fn file_search(filename: &str, pwd: bool, home: bool) -> Option<String> {
     let mut paths: Vec<PathBuf> = vec![];
 
@@ -30,8 +21,8 @@ pub fn file_search(filename: &str, pwd: bool, home: bool) -> Option<String> {
     None
 }
 
-pub fn file_exists(filename: &str) -> bool {
-    Path::new(filename).exists()
+pub fn file_exists<S: std::convert::AsRef<std::ffi::OsStr>>(filename: S) -> bool {
+    Path::new(&filename).exists()
 }
 
 pub fn read_file(pathbuf: PathBuf) -> CliResult<String> {
@@ -50,8 +41,28 @@ pub fn copy_file<F: AsRef<Path>, T: AsRef<Path>>(from: F, to: T) -> CliResult<()
     Ok(fs::copy(from, to).map(|_| ())?)
 }
 
-pub fn copy_files_recursively(pathbuf: PathBuf) -> CliResult<()> {
-    Ok(())
+pub fn copy_dir<F: AsRef<Path>, T: AsRef<Path>>(from: F, to: T) -> CliResult<()> {
+    use fs_extra::dir::*;
+    let options = CopyOptions::new();
+    Ok(copy(from, to, &options).map(|_| ())?)
+}
+
+// pub fn copy_files_recursively(pathbuf: PathBuf) -> CliResult<()> {
+//     Ok(())
+// }
+
+pub fn home_dir() -> CliResult<PathBuf> {
+    Ok(dirs::home_dir().ok_or(failure::format_err!(
+        "There was a problem locating your home directory."
+    ))?)
+}
+
+pub fn expand_home_path(path: String) -> CliResult<String> {
+    let home_dir: String = home_dir()?
+        .into_os_string()
+        .into_string()
+        .map_err(|_| failure::format_err!("Could not convert OS string to rust string."))?;
+    Ok(path.replace("~", &home_dir))
 }
 
 #[test]

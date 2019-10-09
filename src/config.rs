@@ -14,14 +14,14 @@ pub struct Component {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct Config {
+pub(crate) struct Config {
     name: String,
     version: String,
     description: String,
     author: String,
     openapi: String,
     auth: String,
-    services: HashMap<String, CDDService>,
+    pub(crate) services: HashMap<String, CDDService>,
 }
 
 impl Config {
@@ -55,7 +55,14 @@ impl Default for Config {
                 project_path: "./rust".to_string(),
             },
         );
-
+        services.insert(
+            "ios".to_string(),
+            CDDService {
+                bin_path: "~/.cdd/services/cdd-swift".to_string(),
+                template_path: "~/.cdd/iOS".to_string(),
+                project_path: "./iOS".to_string(),
+            },
+        );
         Config {
             name: "default project".to_string(),
             version: "0.0.1".to_string(),
