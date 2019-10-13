@@ -4,15 +4,26 @@ use log::*;
 use std::path::PathBuf;
 
 pub fn sync() -> CliResult<()> {
-    // load config
-    let config = load_config_file()?;
+    let project_path = PathBuf::from(".");
+    let mut project = project::Project::read(&project_path)?;
+
     // ensure all projects are in place
-    let _ = ensure_projects_exist(config)?;
-    // load spec
-    let _spec = load_openapi_spec()?;
-    // collect model tree using adaptors
-    // sync trees into an instruction graph
-    // execute graph
+    project.copy_templates()?;
+
+    let instructions = project.generate_project_graphs()?;
+
+    println!("instructions: {:?}", instructions);
+
+    // load config
+    // let config = load_config_file()?;
+    // let _ = ensure_projects_exist(config)?;
+    // // load spec
+    // let spec = load_openapi_spec()?;
+    // // collect model graph using adaptors
+    // let spec_graph = project_graph::ProjectGraph::from(spec);
+    // println!("graph: {:?}", &spec_graph);
+    // sync graphs into an instruction tree
+    // execute tree
     Ok(())
 }
 
@@ -53,12 +64,16 @@ fn load_config_file() -> CliResult<config::Config> {
     Ok(config)
 }
 
-fn load_openapi_spec() -> CliResult<()> {
+use openapiv3::OpenAPI;
+fn load_openapi_spec() -> CliResult<OpenAPI> {
     let spec_path: PathBuf = PathBuf::from("openapi.yml");
 
     if !spec_path.exists() {
         return Err(failure::format_err!("Could not find openapi.yml"));
     };
 
-    Ok(())
+    let spec = std::fs::read_to_string(spec_path).unwrap();
+    let openapi: OpenAPI = serde_yaml::from_str(&spec).expect("Could not deserialize input");
+
+    Ok(openapi)
 }

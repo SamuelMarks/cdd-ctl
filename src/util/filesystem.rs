@@ -9,7 +9,9 @@ pub fn file_search(filename: &str, pwd: bool, home: bool) -> Option<String> {
         paths.push(PathBuf::from(format!("./{}", filename)));
     }
     if home {
-        paths.push(PathBuf::from(format!("~/{}", filename)));
+        if let Ok(home_dir) = home_dir() {
+            paths.push(home_dir);
+        }
     }
 
     for path in paths {

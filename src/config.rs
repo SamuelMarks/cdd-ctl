@@ -53,6 +53,7 @@ impl Default for Config {
                 bin_path: "~/.cdd/services/cdd-rust".to_string(),
                 template_path: "~/.cdd/rust".to_string(),
                 project_path: "./rust".to_string(),
+                component_file: "".to_string(),
             },
         );
         services.insert(
@@ -61,6 +62,7 @@ impl Default for Config {
                 bin_path: "~/.cdd/services/cdd-swift".to_string(),
                 template_path: "~/.cdd/iOS".to_string(),
                 project_path: "./iOS".to_string(),
+                component_file: "cddTemplate/Source/API/APIModels.swift".to_string(),
             },
         );
         Config {
