@@ -6,15 +6,15 @@ license = "Apache-2.0 OR MIT"
 edition = "2018"
 
 [dependencies]
-structopt = "0.2"
+structopt = "0.3.3"
 serde = { version = "1.0", features = ["derive"] }
 serde_yaml = "0.8"
 dirs = "2.0.2"
-colored = "1.7"
+colored = "1.8.0"
 log = "0.4"
-simplelog = "0.7.3"
+simplelog = "0.7.4"
 fs_extra = "1.1.0"
-failure = "0.1.5"
+failure = "0.1.6"
 openapiv3 = "0.3"
 
 [lib]

@@ -28,7 +28,6 @@ enum Command {
 
 /// Compiler driven development cli tool
 #[derive(StructOpt, Debug)]
-#[structopt(raw(setting = "structopt::clap::AppSettings::ColoredHelp"))]
 #[structopt(name = "cdd")]
 struct Opt {
     #[structopt(subcommand)]
