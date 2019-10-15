@@ -24,8 +24,10 @@ pub struct Model {
     // date_modified: Date,
 }
 
-#[derive(Debug, PartialEq)]
-pub struct Route;
+#[derive(Debug, PartialEq, Deserialize, Serialize)]
+pub struct Route {
+    name: String,
+}
 
 impl From<openapiv3::OpenAPI> for ProjectGraph {
     fn from(openapi: openapiv3::OpenAPI) -> Self {

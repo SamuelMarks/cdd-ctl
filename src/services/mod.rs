@@ -14,11 +14,13 @@ pub(crate) struct CDDService {
 
 impl CDDService {
     pub fn extract_models(&self) -> CliResult<Vec<Model>> {
-        self.exec(vec!["--list-models"]).and_then(decode_json)
+        self.exec(vec!["list-models", "blah.rust"])
+            .and_then(|json| Ok(serde_json::from_str::<Vec<Model>>(&json)?))
     }
 
     pub fn extract_routes(&self) -> CliResult<Vec<Route>> {
-        Ok(Vec::new())
+        self.exec(vec!["test-error"])
+            .and_then(|json| Ok(serde_json::from_str::<Vec<Route>>(&json)?))
     }
 
     fn exec(&self, args: Vec<&str>) -> CliResult<String> {
@@ -37,8 +39,4 @@ impl CDDService {
         };
         cmd
     }
-}
-
-fn decode_json(json: String) -> CliResult<Vec<Model>> {
-    Ok(serde_json::from_str(&json)?)
 }

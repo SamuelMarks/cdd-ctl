@@ -4,6 +4,10 @@ fn main() {
     let result = cdd::run();
     match result {
         Ok(_) => (),
-        Err(err) => error!("{}", err),
+        Err(err) => {
+            for line in format!("{}", err).lines() {
+                error!("{}", line)
+            }
+        }
     };
 }
