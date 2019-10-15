@@ -21,7 +21,7 @@ impl CDDService {
 
     pub fn extract_routes(&self) -> CliResult<Vec<Route>> {
         info!("Extracting routes from {}", self.component_file);
-        self.exec(vec!["test-error"])
+        self.exec(vec!["list-routes", &self.component_file])
             .and_then(|json| Ok(serde_json::from_str::<Vec<Route>>(&json)?))
     }
 
@@ -34,19 +34,7 @@ impl CDDService {
                 &self.bin_path
             ));
         }
-        let cmd = util::exec(&bin_path, args);
-        match &cmd {
-            Ok(msg) => {
-                for line in format!("{}", msg).lines() {
-                    info!("{}", line)
-                }
-            }
-            Err(err) => {
-                for line in format!("{}", err).lines() {
-                    error!("{}", line)
-                }
-            }
-        };
-        cmd
+
+        util::exec(&bin_path, args)
     }
 }

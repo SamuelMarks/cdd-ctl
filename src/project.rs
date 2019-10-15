@@ -41,7 +41,7 @@ impl Project {
                 let template_path = util::expand_home_path(service.template_path.clone())?;
                 util::copy_dir(template_path, ".")?;
             } else {
-                info!("Found: {}", name);
+                info!("Found service: {}", name);
             }
         }
         Ok(())

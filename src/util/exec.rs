@@ -1,5 +1,5 @@
 use crate::*;
-use std::process::{Command, ExitStatus};
+use std::process::Command;
 
 pub fn exec(cmd: &str, args: Vec<&str>) -> CliResult<String> {
     let output = Command::new(cmd).args(&args).output()?;
