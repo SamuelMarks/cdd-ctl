@@ -12,7 +12,10 @@ pub fn sync() -> CliResult<()> {
 
     let graph = project.generate_project_graphs()?;
 
-    println!("graph: {:?}", graph);
+    info!(
+        "Successfully generated project graph with models ({:?}) and routes ({:?})",
+        graph, graph
+    );
 
     // load config
     // let config = load_config_file()?;
