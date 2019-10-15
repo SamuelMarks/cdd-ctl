@@ -12,6 +12,8 @@ pub fn sync() -> CliResult<()> {
 
     let graph = project.generate_project_graphs()?;
 
+    project.simple_sync()?;
+
     info!(
         "Successfully generated project graph with models ({:?}) and routes ({:?})",
         graph, graph

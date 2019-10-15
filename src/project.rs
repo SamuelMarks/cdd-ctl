@@ -25,6 +25,26 @@ impl Project {
         })
     }
 
+    /// super basic one way spec -> projects sync
+    pub fn simple_sync(&self) -> CliResult<()> {
+        for (name, service) in self.config.services.clone() {
+            let graph = project_graph::ProjectGraph::from(self.spec.clone());
+
+            for model in graph.models {
+                if service.contains_model(&model)? {
+                    info!("Model {} was found in project {}", &model.name, name);
+                } else {
+                    warn!(
+                        "Model {} was not found in project {}, adding...",
+                        &model.name, name
+                    );
+                }
+            }
+        }
+
+        Ok(())
+    }
+
     pub fn copy_templates(&self) -> CliResult<()> {
         info!("Checking project directories");
         for (name, service) in self.config.services.clone() {

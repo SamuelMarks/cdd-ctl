@@ -25,6 +25,15 @@ impl CDDService {
             .and_then(|json| Ok(serde_json::from_str::<Vec<Route>>(&json)?))
     }
 
+    pub fn contains_model(&self, model: &Model) -> CliResult<bool> {
+        Ok(self
+            .extract_models()?
+            .into_iter()
+            .map(|model| model.name)
+            .collect::<Vec<String>>()
+            .contains(&model.name.to_string()))
+    }
+
     fn exec(&self, args: Vec<&str>) -> CliResult<String> {
         let bin_path = util::expand_home_path(self.bin_path.clone())?;
 

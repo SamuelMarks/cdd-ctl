@@ -20,7 +20,7 @@ pub struct ProjectGraph {
 
 #[derive(Debug, PartialEq, Clone, Deserialize, Serialize)]
 pub struct Model {
-    name: String,
+    pub name: String,
     // date_modified: Date,
 }
 
