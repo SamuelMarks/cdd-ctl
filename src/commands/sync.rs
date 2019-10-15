@@ -10,9 +10,9 @@ pub fn sync() -> CliResult<()> {
     // ensure all projects are in place
     project.copy_templates()?;
 
-    let instructions = project.generate_project_graphs()?;
+    let graph = project.generate_project_graphs()?;
 
-    println!("instructions: {:?}", instructions);
+    println!("graph: {:?}", graph);
 
     // load config
     // let config = load_config_file()?;

@@ -2,6 +2,7 @@ use crate::project_graph::*;
 use crate::*;
 use log::*;
 use serde::{Deserialize, Serialize};
+use serde_json;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub(crate) struct CDDService {
@@ -13,7 +14,11 @@ pub(crate) struct CDDService {
 
 impl CDDService {
     pub fn extract_models(&self) -> CliResult<Vec<Model>> {
-        self.exec(vec!["--list-models"]).map(|_| Vec::new())
+        self.exec(vec!["--list-models"]).and_then(decode_json)
+    }
+
+    pub fn extract_routes(&self) -> CliResult<Vec<Route>> {
+        Ok(Vec::new())
     }
 
     fn exec(&self, args: Vec<&str>) -> CliResult<String> {
@@ -32,4 +37,8 @@ impl CDDService {
         };
         cmd
     }
+}
+
+fn decode_json(json: String) -> CliResult<Vec<Model>> {
+    Ok(serde_json::from_str(&json)?)
 }

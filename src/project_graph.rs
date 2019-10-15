@@ -1,5 +1,6 @@
 use crate::*;
 use log::*;
+use serde::{Deserialize, Serialize};
 
 // A graph is generated from spec or project source, compared and derived as a source of truth.
 #[derive(Debug, PartialEq)]
@@ -17,7 +18,7 @@ pub struct ProjectGraph {
 //     AddModel(Model),
 // }
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, Deserialize, Serialize)]
 pub struct Model {
     name: String,
     // date_modified: Date,

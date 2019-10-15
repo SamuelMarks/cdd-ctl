@@ -61,12 +61,16 @@ impl Project {
 
     pub fn generate_project_graphs(&self) -> CliResult<Vec<ProjectGraph>> {
         info!("Generating project graphs");
+        let mut graphs = Vec::new();
 
-        for (name, service) in self.config.services.clone() {
-            let spec_graph = service.extract_models()?;
+        for (_name, service) in self.config.services.clone() {
+            graphs.push(ProjectGraph {
+                models: service.extract_models()?,
+                routes: service.extract_routes()?,
+            })
         }
 
-        Ok(vec![])
+        Ok(graphs)
     }
 }
 
