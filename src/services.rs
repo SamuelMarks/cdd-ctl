@@ -30,9 +30,19 @@ impl CDDService {
         Ok(())
     }
 
+    pub fn insert_or_update_route(&self, route: Route) -> CliResult<()> {
+        info!("Inserting/Updating route {}", route.name);
+        Ok(())
+    }
+
     pub fn delete_model(&self, name: &str) -> CliResult<String> {
         warn!("Deleting model {}", name);
         self.exec(vec!["delete-model", name])
+    }
+
+    pub fn delete_route(&self, name: &str) -> CliResult<String> {
+        warn!("Deleting route {}", name);
+        self.exec(vec!["delete-route", name])
     }
 
     pub fn model_names(&self) -> CliResult<Vec<String>> {

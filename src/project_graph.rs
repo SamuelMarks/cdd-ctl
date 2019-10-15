@@ -34,7 +34,7 @@ pub struct Model {
 
 #[derive(Debug, PartialEq, Deserialize, Serialize)]
 pub struct Route {
-    name: String,
+    pub name: String,
 }
 
 impl From<openapiv3::OpenAPI> for ProjectGraph {
