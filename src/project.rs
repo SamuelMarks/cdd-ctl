@@ -1,6 +1,7 @@
 use crate::config::Config;
 use crate::instruction::Instruction;
 use crate::project_graph::*;
+use crate::services::*;
 use crate::*;
 use log::*;
 use openapiv3::OpenAPI;
@@ -25,31 +26,39 @@ impl Project {
         })
     }
 
+    fn simple_sync_models(master_models: Vec<Model>, service: &CDDService) -> CliResult<()> {
+        let models_in_project = service.extract_models()?.all_names();
+        let models_in_spec = master_models;
+
+        for model in models_in_project
+            .into_iter()
+            .filter(|model_name| !models_in_spec.all_names().contains(&model_name))
+        {
+            // delete
+            service.delete_model(&model)?;
+        }
+
+        for model in models_in_spec {
+            let model_name = &model.name;
+            if service.contains_model(model_name)? {
+                info!("Model {} was found in project", model_name);
+            } else {
+                warn!(
+                    "Model {} was not found in project, inserting...",
+                    &model_name
+                );
+                service.insert_or_update_model(model)?;
+            }
+        }
+
+        Ok(())
+    }
+
     /// super basic one way spec -> projects sync
     pub fn simple_sync(&self) -> CliResult<()> {
         for (name, service) in self.config.services.clone() {
-            let graph = project_graph::ProjectGraph::from(self.spec.clone());
-            let models_in_service = service.extract_models()?.all_names();
-            let models_in_graph = graph.models.all_names();
-
-            for model in models_in_service
-                .into_iter()
-                .filter(|model_name| models_in_graph.contains(model_name))
-            {
-                // delete
-                service.delete_model(&model)?;
-            }
-
-            for model in graph.models {
-                if service.contains_model(&model)? {
-                    info!("Model {} was found in project {}", &model.name, name);
-                } else {
-                    warn!(
-                        "Model {} was not found in project {}, adding...",
-                        &model.name, name
-                    );
-                }
-            }
+            let spec_graph = project_graph::ProjectGraph::from(self.spec.clone());
+            let _ = Project::simple_sync_models(spec_graph.models, &service)?;
         }
 
         Ok(())

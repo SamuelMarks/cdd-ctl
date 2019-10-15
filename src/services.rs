@@ -25,14 +25,15 @@ impl CDDService {
             .and_then(|json| Ok(serde_json::from_str::<Vec<Route>>(&json)?))
     }
 
-    pub fn insert_or_update_model(&self, model: Model) -> CliResult<()> {
+    pub fn insert_or_update_model(&self, model: Model) -> CliResult<String> {
         info!("Inserting/Updating model {}", model.name);
-        Ok(())
+        error!(":::{}", &serde_json::to_string(&model)?);
+        Ok(self.exec(vec!["update-model", &serde_json::to_string(&model)?])?)
     }
 
-    pub fn insert_or_update_route(&self, route: Route) -> CliResult<()> {
+    pub fn insert_or_update_route(&self, route: Route) -> CliResult<String> {
         info!("Inserting/Updating route {}", route.name);
-        Ok(())
+        Ok(self.exec(vec!["update-route", &serde_json::to_string(&route)?])?)
     }
 
     pub fn delete_model(&self, name: &str) -> CliResult<String> {
@@ -53,8 +54,8 @@ impl CDDService {
             .collect())
     }
 
-    pub fn contains_model(&self, model: &Model) -> CliResult<bool> {
-        Ok(self.model_names()?.contains(&model.name.to_string()))
+    pub fn contains_model(&self, model_name: &str) -> CliResult<bool> {
+        Ok(self.model_names()?.contains(&model_name.to_string()))
     }
 
     fn exec(&self, args: Vec<&str>) -> CliResult<String> {
