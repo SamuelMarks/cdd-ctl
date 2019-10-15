@@ -10,6 +10,14 @@ pub struct ProjectGraph {
     // config: ProjectConfig
     // service: Service
 }
+pub trait CustomIterators {
+    fn all_names(&self) -> Vec<String>;
+}
+impl CustomIterators for Vec<Model> {
+    fn all_names(&self) -> Vec<String> {
+        self.into_iter().map(|model| model.name.clone()).collect()
+    }
+}
 
 // instruction_tree: HashMap<String, MergeInstruction>
 // pub enum MergeInstruction {

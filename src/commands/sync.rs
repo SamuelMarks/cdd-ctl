@@ -5,19 +5,17 @@ use std::path::PathBuf;
 
 pub fn sync() -> CliResult<()> {
     let project_path = PathBuf::from(".");
-    let mut project = project::Project::read(&project_path)?;
+    let project = project::Project::read(&project_path)?;
 
     // ensure all projects are in place
     project.copy_templates()?;
-
-    let graph = project.generate_project_graphs()?;
-
     project.simple_sync()?;
 
-    info!(
-        "Successfully generated project graph with models ({:?}) and routes ({:?})",
-        graph, graph
-    );
+    // let graph = project.generate_project_graphs()?;
+    // info!(
+    //     "Successfully generated project graph with models ({:?}) and routes ({:?})",
+    //     graph, graph
+    // );
 
     // load config
     // let config = load_config_file()?;

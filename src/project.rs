@@ -1,6 +1,6 @@
 use crate::config::Config;
 use crate::instruction::Instruction;
-use crate::project_graph::ProjectGraph;
+use crate::project_graph::*;
 use crate::*;
 use log::*;
 use openapiv3::OpenAPI;
@@ -29,6 +29,16 @@ impl Project {
     pub fn simple_sync(&self) -> CliResult<()> {
         for (name, service) in self.config.services.clone() {
             let graph = project_graph::ProjectGraph::from(self.spec.clone());
+            let models_in_service = service.extract_models()?.all_names();
+            let models_in_graph = graph.models.all_names();
+
+            for model in models_in_service
+                .into_iter()
+                .filter(|model_name| models_in_graph.contains(model_name))
+            {
+                // delete
+                service.delete_model(&model)?;
+            }
 
             for model in graph.models {
                 if service.contains_model(&model)? {
