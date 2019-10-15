@@ -53,9 +53,11 @@ impl Default for Config {
                 bin_path: "~/.cdd/services/cdd-rust".to_string(),
                 template_path: "~/.cdd/rust".to_string(),
                 project_path: "./rust".to_string(),
-                component_file: "".to_string(),
+                component_file: "src/api/models.rs".to_string(),
             },
         );
+
+        #[cfg(target_os = "macos")]
         services.insert(
             "ios".to_string(),
             CDDService {

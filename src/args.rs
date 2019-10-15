@@ -13,12 +13,11 @@ enum Command {
         path: PathBuf,
     },
 
-    #[structopt(
-        name = "regenerate",
-        about = "Regenerates templates (warning: overwrites existing templates)"
-    )]
-    Regenerate,
-
+    // #[structopt(
+    //     name = "regenerate",
+    //     about = "Regenerates templates (warning: overwrites existing templates)"
+    // )]
+    // Regenerate,
     #[structopt(
         name = "sync",
         about = "Syncs CDD projects using language-specific adaptors"
@@ -57,7 +56,7 @@ pub fn run() -> CliResult<()> {
 
     match opt.cmd {
         Command::Init { path } => crate::commands::init(path),
-        Command::Regenerate => crate::commands::regenerate(),
+        // Command::Regenerate => crate::commands::regenerate(),
         Command::Sync => crate::commands::sync(),
     }
 }
