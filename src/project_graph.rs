@@ -44,7 +44,6 @@ impl ProjectGraph {
         info!("Checking project directories");
         for (name, service) in self.config.services.clone() {
             let project_path = service.project_path.clone();
-            // let project_path = PathBuf::from(".");
             if !util::file_exists(project_path.clone()) {
                 warn!(
                     "Could not find local project for {} at {} - copying fresh template from {}",
