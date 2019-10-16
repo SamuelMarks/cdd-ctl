@@ -2,7 +2,6 @@ mod args;
 mod commands;
 mod config;
 mod error;
-mod instruction;
 mod logger;
 mod project;
 mod project_graph;

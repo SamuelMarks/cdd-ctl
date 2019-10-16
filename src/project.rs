@@ -57,29 +57,14 @@ impl From<openapiv3::OpenAPI> for Project {
 
         use openapiv3::*;
         for (path, item) in openapi.paths {
-            // println!("{:?}", (path, item.get));
-
             if let ReferenceOr::Item(item) = item {
                 if let Some(get) = item.get {
-                    println!("GET {}", path);
                     routes.push(Route {
                         method: "GET".to_string(),
                         path,
                     });
                 }
             }
-
-            // match item {
-            //     ReferenceOr::Item(item) => println!("{:?}", extract_routes_from_pathitem(item)),
-            //     _ => panic!("references are unsupported!"),
-            // }
-            // match item {
-            //     PathItem::
-            // }
-            // for (route, method) in item {
-            //     // models.push(Model { name: name })
-            //     println!("{:?}{:?}", route, method)
-            // }
         }
 
         Project { models, routes }

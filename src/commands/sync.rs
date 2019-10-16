@@ -11,22 +11,6 @@ pub fn sync() -> CliResult<()> {
     project.copy_templates()?;
     project.simple_sync()?;
 
-    // let graph = project.generate_project_graphs()?;
-    // info!(
-    //     "Successfully generated project graph with models ({:?}) and routes ({:?})",
-    //     graph, graph
-    // );
-
-    // load config
-    // let config = load_config_file()?;
-    // let _ = ensure_projects_exist(config)?;
-    // // load spec
-    // let spec = load_openapi_spec()?;
-    // // collect model graph using adaptors
-    // let spec_graph = project_graph::ProjectGraph::from(spec);
-    // println!("graph: {:?}", &spec_graph);
-    // sync graphs into an instruction tree
-    // execute tree
     Ok(())
 }
 

@@ -44,10 +44,6 @@ struct Opt {
 
 pub fn run() -> CliResult<()> {
     let opt = Opt::from_args();
-    // if opt.init {
-    //     println!("initialising new config...");
-    //     Config::default().write(PathBuf::from(r"./config.yaml"))?;
-    // }
 
     let _ = logger::start_logger(opt.verbose, false);
 
