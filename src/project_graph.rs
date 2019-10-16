@@ -83,16 +83,17 @@ impl ProjectGraph {
 
     /// super basic one way spec -> projects sync
     pub fn simple_sync(&self) -> CliResult<()> {
+        let spec_graph = Project::from(self.spec.clone());
+        info!(
+            "Found {} models, {} routes in {}",
+            spec_graph.models.len(),
+            spec_graph.routes.len(),
+            "openapi.yml"
+        );
         for (_name, service) in self.config.services.clone() {
-            let spec_graph = Project::from(self.spec.clone());
-            info!(
-                "Found {} models, {} routes in {}",
-                spec_graph.models.len(),
-                spec_graph.routes.len(),
-                "openapi.yml"
-            );
-            let _ = ProjectGraph::simple_sync_models(spec_graph.models, &service)?;
-            let _ = ProjectGraph::simple_sync_routes(spec_graph.routes, &service)?;
+            service.sync_with(&spec_graph)?;
+            // let _ = ProjectGraph::simple_sync_models(spec_graph.models, &service)?;
+            // let _ = ProjectGraph::simple_sync_routes(spec_graph.routes, &service)?;
         }
 
         Ok(())

@@ -13,6 +13,33 @@ pub(crate) struct CDDService {
 }
 
 impl CDDService {
+    pub fn sync_with(&self, project: &Project) -> CliResult<()> {
+        let project_model_names = self.extract_models()?.all_names();
+        let spec_model_names = project.models.all_names();
+
+        for model in project_model_names
+            .into_iter()
+            .filter(|model_name| !spec_model_names.contains(&model_name))
+        {
+            self.delete_model(&model)?;
+        }
+
+        for model in project.models.clone() {
+            let model_name = &model.name;
+            if self.contains_model(model_name)? {
+                info!("Model {} was found in project", model_name);
+            } else {
+                warn!(
+                    "Model {} was not found in project, inserting...",
+                    &model_name
+                );
+                self.insert_or_update_model(model)?;
+            }
+        }
+
+        Ok(())
+    }
+
     pub fn extract_models(&self) -> CliResult<Vec<Model>> {
         info!("Extracting models from {}", self.component_file);
         self.exec(vec!["list-models", &self.component_file])
