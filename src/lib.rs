@@ -6,7 +6,7 @@ mod instruction;
 mod logger;
 mod project;
 mod project_graph;
-mod services;
+mod service;
 mod util;
 
 pub use self::args::run;

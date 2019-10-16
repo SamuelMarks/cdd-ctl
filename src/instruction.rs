@@ -1,7 +1,7 @@
-use crate::project_graph::*;
+// use crate::project::*;
 
-#[derive(Debug)]
-pub enum Instruction {
-    AddModel(Model),
-    RemoveModel(Model),
-}
+// #[derive(Debug)]
+// pub enum Instruction {
+//     AddModel(Model),
+//     RemoveModel(Model),
+// }

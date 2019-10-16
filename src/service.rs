@@ -1,4 +1,4 @@
-use crate::project_graph::*;
+use crate::project::*;
 use crate::*;
 use log::*;
 use serde::{Deserialize, Serialize};
