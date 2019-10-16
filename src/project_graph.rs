@@ -1,6 +1,5 @@
 use crate::config::Config;
 use crate::project::*;
-use crate::service::*;
 use crate::*;
 use log::*;
 use openapiv3::OpenAPI;
@@ -24,62 +23,6 @@ impl ProjectGraph {
             // graphs,
         })
     }
-
-    // fn simple_sync_models(master_models: Vec<Model>, service: &CDDService) -> CliResult<()> {
-    //     let models_in_project = service.extract_models()?.all_names();
-    //     let models_in_spec = master_models;
-
-    //     for model in models_in_project
-    //         .into_iter()
-    //         .filter(|model_name| !models_in_spec.all_names().contains(&model_name))
-    //     {
-    //         // delete
-    //         service.delete_model(&model)?;
-    //     }
-
-    //     for model in models_in_spec {
-    //         let model_name = &model.name;
-    //         if service.contains_model(model_name)? {
-    //             info!("Model {} was found in project", model_name);
-    //         } else {
-    //             warn!(
-    //                 "Model {} was not found in project, inserting...",
-    //                 &model_name
-    //             );
-    //             service.insert_or_update_model(model)?;
-    //         }
-    //     }
-
-    //     Ok(())
-    // }
-
-    // fn simple_sync_routes(master_routes: Vec<Route>, service: &CDDService) -> CliResult<()> {
-    //     let routes_in_project = service.extract_routes()?.all_names();
-    //     let routes_in_spec = master_routes;
-
-    //     for route_name in routes_in_project
-    //         .into_iter()
-    //         .filter(|route_name| !routes_in_spec.all_names().contains(&route_name))
-    //     {
-    //         // delete
-    //         service.delete_route(&route_name)?;
-    //     }
-
-    //     for route in routes_in_spec {
-    //         let route_name = &route.name;
-    //         if service.contains_route(route_name)? {
-    //             info!("Route {} was found in project", route_name);
-    //         } else {
-    //             warn!(
-    //                 "Route {} was not found in project, inserting...",
-    //                 &route_name
-    //             );
-    //             service.insert_or_update_route(route)?;
-    //         }
-    //     }
-
-    //     Ok(())
-    // }
 
     /// super basic one way spec -> projects sync
     pub fn simple_sync(&self) -> CliResult<()> {

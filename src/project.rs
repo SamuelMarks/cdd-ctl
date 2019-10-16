@@ -52,6 +52,15 @@ impl From<openapiv3::OpenAPI> for Project {
                 models.push(Model { name: name })
             }
         }
+
+        for (path, item) in openapi.paths {
+            println!("{:?}", (path, item));
+            // for (route, method) in item {
+            //     // models.push(Model { name: name })
+            //     println!("{:?}{:?}", route, method)
+            // }
+        }
+
         Project {
             models,
             routes: vec![],
