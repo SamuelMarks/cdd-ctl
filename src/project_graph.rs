@@ -34,9 +34,7 @@ impl ProjectGraph {
             "openapi.yml"
         );
         for (_name, service) in self.config.services.clone() {
-            println!("BEFORE");
             service.sync_with(&spec_graph)?;
-            println!("AFTER");
         }
 
         Ok(())
