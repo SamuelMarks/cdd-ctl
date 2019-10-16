@@ -7,19 +7,19 @@ use log::*;
 use openapiv3::OpenAPI;
 use std::path::PathBuf;
 
-pub struct Project {
+pub struct ProjectGraph {
     config: Config,
     spec: OpenAPI,
     // graphs: Vec<ProjectGraph>,
 }
 
-impl Project {
+impl ProjectGraph {
     pub fn read(path: &PathBuf) -> CliResult<Self> {
         let config = Config::read(path.join("config.yml"))?;
         let spec = load_openapi_spec()?;
         // let graphs = vec![];
 
-        Ok(Project {
+        Ok(ProjectGraph {
             config,
             spec,
             // graphs,
@@ -85,15 +85,15 @@ impl Project {
     /// super basic one way spec -> projects sync
     pub fn simple_sync(&self) -> CliResult<()> {
         for (_name, service) in self.config.services.clone() {
-            let spec_graph = project_graph::ProjectGraph::from(self.spec.clone());
+            let spec_graph = project_graph::Project::from(self.spec.clone());
             info!(
                 "Found {} models, {} routes in {}",
                 spec_graph.models.len(),
                 spec_graph.routes.len(),
                 "openapi.yml"
             );
-            let _ = Project::simple_sync_models(spec_graph.models, &service)?;
-            let _ = Project::simple_sync_routes(spec_graph.routes, &service)?;
+            let _ = ProjectGraph::simple_sync_models(spec_graph.models, &service)?;
+            let _ = ProjectGraph::simple_sync_routes(spec_graph.routes, &service)?;
         }
 
         Ok(())
@@ -123,7 +123,7 @@ impl Project {
 
     pub fn generate_instruction_tree(&self) -> CliResult<Vec<Instruction>> {
         info!("Generating project graphs");
-        let spec_graph = project_graph::ProjectGraph::from(self.spec.clone());
+        let spec_graph = project_graph::Project::from(self.spec.clone());
         let mut instruction_tree = Vec::new();
 
         for model in spec_graph.models {
@@ -133,12 +133,12 @@ impl Project {
         Ok(instruction_tree)
     }
 
-    pub fn generate_project_graphs(&self) -> CliResult<Vec<ProjectGraph>> {
+    pub fn generate_project_graphs(&self) -> CliResult<Vec<Project>> {
         info!("Generating project graphs");
         let mut graphs = Vec::new();
 
         for (_name, service) in self.config.services.clone() {
-            graphs.push(ProjectGraph {
+            graphs.push(Project {
                 models: service.extract_models()?,
                 routes: service.extract_routes()?,
             })

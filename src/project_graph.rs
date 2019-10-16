@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 // A graph is generated from spec or project source, compared and derived as a source of truth.
 #[derive(Debug, PartialEq)]
-pub struct ProjectGraph {
+pub struct Project {
     pub models: Vec<Model>,
     pub routes: Vec<Route>,
     // config: ProjectConfig
@@ -42,7 +42,7 @@ pub struct Route {
     pub name: String,
 }
 
-impl From<openapiv3::OpenAPI> for ProjectGraph {
+impl From<openapiv3::OpenAPI> for Project {
     fn from(openapi: openapiv3::OpenAPI) -> Self {
         info!("Creating project graph from OpenAPI spec");
         let mut models = vec![];
@@ -52,7 +52,7 @@ impl From<openapiv3::OpenAPI> for ProjectGraph {
                 models.push(Model { name: name })
             }
         }
-        ProjectGraph {
+        Project {
             models,
             routes: vec![],
         }
