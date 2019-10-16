@@ -13,20 +13,33 @@ pub(crate) struct CDDService {
 }
 
 impl CDDService {
-    pub fn sync_with(&self, project: &Project) -> CliResult<()> {
-        let project_model_names = self.extract_models()?.all_names();
-        let spec_model_names = project.models.all_names();
+    pub fn sync_with(&self, spec_project: &Project) -> CliResult<()> {
+        let project = self.extract_project()?;
+
+        let project_model_names = project.models.all_names();
+        let spec_model_names = spec_project.models.all_names();
+        let project_route_names = project.routes.all_names();
+        let spec_route_names = spec_project.routes.all_names();
+
+        info!(
+            "Found {} models ({}), {} routes ({}) in {}",
+            project.models.len(),
+            project_model_names.join(", "),
+            project.routes.len(),
+            project_route_names.join(", "),
+            self.project_path,
+        );
 
         for model in project_model_names
-            .into_iter()
-            .filter(|model_name| !spec_model_names.contains(&model_name))
+            .iter()
+            .filter(|model_name| !spec_model_names.contains(model_name))
         {
             self.delete_model(&model)?;
         }
 
-        for model in project.models.clone() {
+        for model in spec_project.models.clone() {
             let model_name = &model.name;
-            if self.contains_model(model_name)? {
+            if project_model_names.contains(model_name) {
                 info!("Model {} was found in project", model_name);
             } else {
                 warn!(
@@ -37,7 +50,36 @@ impl CDDService {
             }
         }
 
+        for route in project_route_names
+            .iter()
+            .filter(|route_name| !spec_route_names.contains(route_name))
+        {
+            self.delete_route(&route)?;
+        }
+
+        for route in spec_project.routes.clone() {
+            let route_name = &route.name;
+            if project_route_names.contains(route_name) {
+                info!("Route {} was found in project", route_name);
+            } else {
+                warn!(
+                    "Route {} was not found in project, inserting...",
+                    &route_name
+                );
+                self.insert_or_update_route(route)?;
+            }
+        }
+
         Ok(())
+    }
+
+    pub fn extract_project(&self) -> CliResult<Project> {
+        info!("Extracting objects from {}", self.project_path);
+
+        Ok(Project {
+            models: self.extract_models()?,
+            routes: self.extract_routes()?,
+        })
     }
 
     pub fn extract_models(&self) -> CliResult<Vec<Model>> {
@@ -72,29 +114,29 @@ impl CDDService {
         self.exec(vec!["delete-route", name])
     }
 
-    pub fn model_names(&self) -> CliResult<Vec<String>> {
-        Ok(self
-            .extract_models()?
-            .into_iter()
-            .map(|model| model.name)
-            .collect())
-    }
+    // pub fn model_names(&self) -> CliResult<Vec<String>> {
+    //     Ok(self
+    //         .extract_models()?
+    //         .into_iter()
+    //         .map(|model| model.name)
+    //         .collect())
+    // }
 
-    pub fn route_names(&self) -> CliResult<Vec<String>> {
-        Ok(self
-            .extract_routes()?
-            .into_iter()
-            .map(|route| route.name)
-            .collect())
-    }
+    // pub fn route_names(&self) -> CliResult<Vec<String>> {
+    //     Ok(self
+    //         .extract_routes()?
+    //         .into_iter()
+    //         .map(|route| route.name)
+    //         .collect())
+    // }
 
-    pub fn contains_model(&self, model_name: &str) -> CliResult<bool> {
-        Ok(self.model_names()?.contains(&model_name.to_string()))
-    }
+    // pub fn contains_model(&self, model_name: &str) -> CliResult<bool> {
+    //     Ok(self.model_names()?.contains(&model_name.to_string()))
+    // }
 
-    pub fn contains_route(&self, route_name: &str) -> CliResult<bool> {
-        Ok(self.route_names()?.contains(&route_name.to_string()))
-    }
+    // pub fn contains_route(&self, route_name: &str) -> CliResult<bool> {
+    //     Ok(self.route_names()?.contains(&route_name.to_string()))
+    // }
 
     fn exec(&self, args: Vec<&str>) -> CliResult<String> {
         let bin_path = util::expand_home_path(self.bin_path.clone())?;

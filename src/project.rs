@@ -37,7 +37,7 @@ pub struct Model {
     // date_modified: Date,
 }
 
-#[derive(Debug, PartialEq, Deserialize, Serialize)]
+#[derive(Debug, PartialEq, Clone, Deserialize, Serialize)]
 pub struct Route {
     pub name: String,
 }
