@@ -18,6 +18,11 @@ impl CustomIterators for Vec<Model> {
         self.into_iter().map(|model| model.name.clone()).collect()
     }
 }
+impl CustomIterators for Vec<Route> {
+    fn all_names(&self) -> Vec<String> {
+        self.into_iter().map(|route| route.name.clone()).collect()
+    }
+}
 
 // instruction_tree: HashMap<String, MergeInstruction>
 // pub enum MergeInstruction {
@@ -53,15 +58,3 @@ impl From<openapiv3::OpenAPI> for ProjectGraph {
         }
     }
 }
-
-// use crate::services::CDDService;
-// impl From<CDDService> for ProjectGraph {
-//     fn from(service: CDDService) -> Self {
-//         info!("Extracting models from: {}", service.component_file);
-//         let models = service.extract_models()?;
-//         ProjectGraph {
-//             models,
-//             routes: vec![],
-//         }
-//     }
-// }

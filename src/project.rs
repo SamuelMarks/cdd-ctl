@@ -54,11 +54,46 @@ impl Project {
         Ok(())
     }
 
+    fn simple_sync_routes(master_routes: Vec<Route>, service: &CDDService) -> CliResult<()> {
+        let routes_in_project = service.extract_routes()?.all_names();
+        let routes_in_spec = master_routes;
+
+        for route_name in routes_in_project
+            .into_iter()
+            .filter(|route_name| !routes_in_spec.all_names().contains(&route_name))
+        {
+            // delete
+            service.delete_route(&route_name)?;
+        }
+
+        for route in routes_in_spec {
+            let route_name = &route.name;
+            if service.contains_route(route_name)? {
+                info!("Route {} was found in project", route_name);
+            } else {
+                warn!(
+                    "Route {} was not found in project, inserting...",
+                    &route_name
+                );
+                service.insert_or_update_route(route)?;
+            }
+        }
+
+        Ok(())
+    }
+
     /// super basic one way spec -> projects sync
     pub fn simple_sync(&self) -> CliResult<()> {
-        for (name, service) in self.config.services.clone() {
+        for (_name, service) in self.config.services.clone() {
             let spec_graph = project_graph::ProjectGraph::from(self.spec.clone());
+            info!(
+                "Found {} models, {} routes in {}",
+                spec_graph.models.len(),
+                spec_graph.routes.len(),
+                "openapi.yml"
+            );
             let _ = Project::simple_sync_models(spec_graph.models, &service)?;
+            let _ = Project::simple_sync_routes(spec_graph.routes, &service)?;
         }
 
         Ok(())
