@@ -58,7 +58,7 @@ impl CDDService {
         }
 
         for route in spec_project.routes.clone() {
-            let route_name = &route.path;
+            let route_name = &route.url_path;
             if project_route_names.contains(route_name) {
                 info!("Route {} was found in project", route_name);
             } else {
@@ -100,7 +100,7 @@ impl CDDService {
     }
 
     pub fn insert_or_update_route(&self, route: Route) -> CliResult<String> {
-        info!("Inserting/Updating route {}", route.path);
+        info!("Inserting/Updating route {}", route.url_path);
         Ok(self.exec(vec!["update-route", &serde_json::to_string(&route)?])?)
     }
 

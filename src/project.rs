@@ -20,7 +20,9 @@ impl CustomIterators for Vec<Model> {
 }
 impl CustomIterators for Vec<Route> {
     fn all_names(&self) -> Vec<String> {
-        self.into_iter().map(|route| route.path.clone()).collect()
+        self.into_iter()
+            .map(|route| route.url_path.clone())
+            .collect()
     }
 }
 
@@ -35,12 +37,25 @@ impl CustomIterators for Vec<Route> {
 pub struct Model {
     pub name: String,
     // date_modified: Date,
+    pub vars: Vec<Variable>,
 }
 
 #[derive(Debug, PartialEq, Clone, Deserialize, Serialize)]
 pub struct Route {
-    pub path: String,
+    // pub name: String,
     pub method: String,
+    pub url_path: String,
+    pub response_type: String,
+    pub error_type: String,
+    pub vars: Vec<Variable>,
+}
+
+#[derive(Debug, PartialEq, Clone, Deserialize, Serialize)]
+pub struct Variable {
+    name: String,
+    required: bool,
+    vartype: String,
+    value: String,
 }
 
 impl From<openapiv3::OpenAPI> for Project {
@@ -51,18 +66,42 @@ impl From<openapiv3::OpenAPI> for Project {
 
         for component in openapi.components {
             for (name, schema) in component.schemas {
-                models.push(Model { name: name })
+                println!("MODEL: {:?}", schema);
+                models.push(Model {
+                    name: name,
+                    vars: Vec::new(),
+                })
             }
         }
 
-        use openapiv3::*;
         for (path, item) in openapi.paths {
-            if let ReferenceOr::Item(item) = item {
-                if let Some(get) = item.get {
-                    routes.push(Route {
-                        method: "GET".to_string(),
-                        path,
-                    });
+            if let openapiv3::ReferenceOr::Item(item) = item {
+                fn make_route(
+                    method: &str,
+                    url_path: &str,
+                    operation: &openapiv3::Operation,
+                ) -> Route {
+                    Route {
+                        method: method.to_string(),
+                        error_type: "".to_string(),
+                        response_type: "".to_string(),
+                        url_path: url_path.to_string(),
+                        vars: Vec::new(),
+                    }
+                }
+
+                if let Some(operation) = item.get {
+                    println!("GET: {:#?}", operation);
+                    routes.push(make_route("GET", &path, &operation));
+                }
+                if let Some(operation) = item.put {
+                    routes.push(make_route("PUT", &path, &operation));
+                }
+                if let Some(operation) = item.post {
+                    routes.push(make_route("POST", &path, &operation));
+                }
+                if let Some(operation) = item.delete {
+                    routes.push(make_route("DELETE", &path, &operation));
                 }
             }
         }
