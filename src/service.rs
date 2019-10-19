@@ -18,15 +18,15 @@ impl CDDService {
 
         let project_model_names = project.models.all_names();
         let spec_model_names = spec_project.models.all_names();
-        let project_route_names = project.routes.all_names();
-        let spec_route_names = spec_project.routes.all_names();
+        let project_request_names = project.requests.all_names();
+        let spec_request_names = spec_project.requests.all_names();
 
         info!(
-            "Found {} models ({}), {} routes ({}) in {}",
+            "Found {} models ({}), {} requests ({}) in {}",
             project.models.len(),
             project_model_names.join(", "),
-            project.routes.len(),
-            project_route_names.join(", "),
+            project.requests.len(),
+            project_request_names.join(", "),
             self.project_path,
         );
 
@@ -37,7 +37,7 @@ impl CDDService {
             self.delete_model(&model)?;
         }
 
-        for model in spec_project.models.clone() {
+        for model in spec_project.models.iter() {
             let model_name = &model.name;
             if project_model_names.contains(model_name) {
                 info!("Model {} was found in project", model_name);
@@ -46,27 +46,27 @@ impl CDDService {
                     "Model {} was not found in project, inserting...",
                     &model_name
                 );
-                self.insert_or_update_model(model)?;
+                self.insert_or_update_model(model.clone())?;
             }
         }
 
-        for route in project_route_names
+        for request in project_request_names
             .iter()
-            .filter(|route_name| !spec_route_names.contains(route_name))
+            .filter(|request_name| !spec_request_names.contains(request_name))
         {
-            self.delete_route(&route)?;
+            self.delete_request(&request)?;
         }
 
-        for route in spec_project.routes.clone() {
-            let route_name = &route.url_path;
-            if project_route_names.contains(route_name) {
-                info!("Route {} was found in project", route_name);
+        for request in spec_project.requests.iter() {
+            let request_name = &request.name;
+            if project_request_names.contains(request_name) {
+                info!("Request {} was found in project", request_name);
             } else {
                 warn!(
-                    "Route {} was not found in project, inserting...",
-                    &route_name
+                    "Request {} was not found in project, inserting...",
+                    &request_name
                 );
-                self.insert_or_update_route(route)?;
+                self.insert_or_update_request(request.clone())?;
             }
         }
 
@@ -78,7 +78,11 @@ impl CDDService {
 
         Ok(Project {
             models: self.extract_models()?,
-            routes: self.extract_routes()?,
+            requests: self.extract_requests()?,
+            info: crate::project::Info {
+                host: "".to_string(),
+                endpoint: "".to_string(),
+            },
         })
     }
 
@@ -88,10 +92,10 @@ impl CDDService {
             .and_then(|json| Ok(serde_json::from_str::<Vec<Model>>(&json)?))
     }
 
-    pub fn extract_routes(&self) -> CliResult<Vec<Route>> {
-        info!("Extracting routes from {}", self.component_file);
-        self.exec(vec!["list-routes", &self.component_file])
-            .and_then(|json| Ok(serde_json::from_str::<Vec<Route>>(&json)?))
+    pub fn extract_requests(&self) -> CliResult<Vec<Request>> {
+        info!("Extracting requests from {}", self.component_file);
+        self.exec(vec!["list-requests", &self.component_file])
+            .and_then(|json| Ok(serde_json::from_str::<Vec<Request>>(&json)?))
     }
 
     pub fn insert_or_update_model(&self, model: Model) -> CliResult<String> {
@@ -99,9 +103,9 @@ impl CDDService {
         Ok(self.exec(vec!["update-model", &serde_json::to_string(&model)?])?)
     }
 
-    pub fn insert_or_update_route(&self, route: Route) -> CliResult<String> {
-        info!("Inserting/Updating route {}", route.url_path);
-        Ok(self.exec(vec!["update-route", &serde_json::to_string(&route)?])?)
+    pub fn insert_or_update_request(&self, request: Request) -> CliResult<String> {
+        info!("Inserting/Updating request {}", request.name);
+        Ok(self.exec(vec!["update-request", &serde_json::to_string(&request)?])?)
     }
 
     pub fn delete_model(&self, name: &str) -> CliResult<String> {
@@ -109,9 +113,9 @@ impl CDDService {
         self.exec(vec!["delete-model", name])
     }
 
-    pub fn delete_route(&self, name: &str) -> CliResult<String> {
-        warn!("Deleting route {}", name);
-        self.exec(vec!["delete-route", name])
+    pub fn delete_request(&self, name: &str) -> CliResult<String> {
+        warn!("Deleting request {}", name);
+        self.exec(vec!["delete-request", name])
     }
 
     // pub fn model_names(&self) -> CliResult<Vec<String>> {
@@ -122,11 +126,11 @@ impl CDDService {
     //         .collect())
     // }
 
-    // pub fn route_names(&self) -> CliResult<Vec<String>> {
+    // pub fn request_names(&self) -> CliResult<Vec<String>> {
     //     Ok(self
-    //         .extract_routes()?
+    //         .extract_requests()?
     //         .into_iter()
-    //         .map(|route| route.name)
+    //         .map(|request| request.name)
     //         .collect())
     // }
 
@@ -134,8 +138,8 @@ impl CDDService {
     //     Ok(self.model_names()?.contains(&model_name.to_string()))
     // }
 
-    // pub fn contains_route(&self, route_name: &str) -> CliResult<bool> {
-    //     Ok(self.route_names()?.contains(&route_name.to_string()))
+    // pub fn contains_request(&self, request_name: &str) -> CliResult<bool> {
+    //     Ok(self.request_names()?.contains(&request_name.to_string()))
     // }
 
     fn exec(&self, args: Vec<&str>) -> CliResult<String> {

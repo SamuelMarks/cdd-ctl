@@ -57,6 +57,16 @@ impl Default for Config {
             },
         );
 
+        services.insert(
+            "kotlin".to_string(),
+            CDDService {
+                bin_path: "~/.cdd/services/cdd-kotlin".to_string(),
+                template_path: "~/.cdd/kotlin".to_string(),
+                project_path: "./kotlin".to_string(),
+                component_file: "src/api/models.kt".to_string(),
+            },
+        );
+
         #[cfg(target_os = "macos")]
         services.insert(
             "ios".to_string(),

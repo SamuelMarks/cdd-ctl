@@ -17,6 +17,7 @@ simplelog = "0.7.4"
 fs_extra = "1.1.0"
 failure = "0.1.6"
 openapiv3 = "0.3"
+url = "2.1.0"
 
 [lib]
 
