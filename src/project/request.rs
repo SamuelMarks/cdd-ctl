@@ -12,12 +12,20 @@ pub struct Request {
 
 #[derive(Debug, PartialEq, Clone, Deserialize, Serialize)]
 pub enum Method {
+    #[serde(rename(serialize = "GET"))]
     Get_,
+    #[serde(rename(serialize = "POST"))]
     Post_,
+    #[serde(rename(serialize = "PUT"))]
     Put_,
+    #[serde(rename(serialize = "DELETE"))]
     Delete_,
+    #[serde(rename(serialize = "OPTIONS"))]
     Options_,
+    #[serde(rename(serialize = "HEAD"))]
     Head_,
+    #[serde(rename(serialize = "PATCH"))]
     Patch_,
+    #[serde(rename(serialize = "TRACE"))]
     Trace_,
 }
