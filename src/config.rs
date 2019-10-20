@@ -65,7 +65,7 @@ impl Default for Config {
                 template_path: "~/.cdd/kotlin".to_string(),
                 project_path: "./kotlin".to_string(),
                 component_file: "API/Models.kt".to_string(),
-                routes_file: "API/Routes.kt".to_string(),
+                routes_file: "API/Requests.kt".to_string(),
             },
         );
 
