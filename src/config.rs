@@ -77,7 +77,7 @@ impl Default for Config {
                 template_path: "~/.cdd/iOS".to_string(),
                 project_path: "./iOS".to_string(),
                 component_file: "cddTemplate/Source/API/APIModels.swift".to_string(),
-                requests_file: "cddTemplate/Source/API/APIRoutes.swift".to_string(),
+                requests_file: "cddTemplate/Source/API/APIRequests.swift".to_string(),
             },
         );
         Config {
