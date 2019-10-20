@@ -42,13 +42,17 @@ impl CDDService {
             let model_name = &model.name;
             if project_model_names.contains(model_name) {
                 info!("Model {} was found in project", model_name);
-                self.update_model(model.clone())?;
+                for line in self.update_model(model.clone())?.lines() {
+                    info!("{}", line);
+                }
             } else {
                 warn!(
                     "Model {} was not found in project, inserting...",
                     &model_name
                 );
-                self.insert_model(model.clone())?;
+                for line in self.insert_model(model.clone())?.lines() {
+                    info!("{}", line);
+                }
             }
         }
 
@@ -63,13 +67,17 @@ impl CDDService {
             let request_name = &request.name;
             if project_request_names.contains(request_name) {
                 info!("Request {} was found in project", request_name);
-                self.update_request(request.clone())?;
+                for line in self.update_request(request.clone())?.lines() {
+                    info!("{}", line);
+                }
             } else {
                 warn!(
                     "Request {} was not found in project, inserting...",
                     &request_name
                 );
-                self.insert_request(request.clone())?;
+                for line in self.insert_request(request.clone())?.lines() {
+                    info!("{}", line);
+                }
             }
         }
 
