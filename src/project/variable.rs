@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, PartialEq, Clone, Deserialize, Serialize)]
 pub struct Variable {
     pub name: String,
+    #[serde(rename(serialize = "type"))]
     pub variable_type: VariableType,
     pub optional: bool,
     pub value: Option<String>,
