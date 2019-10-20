@@ -54,6 +54,7 @@ impl Default for Config {
                 template_path: "~/.cdd/rust".to_string(),
                 project_path: "./rust".to_string(),
                 component_file: "src/api/models.rs".to_string(),
+                routes_file: "src/api/routes.rs".to_string(),
             },
         );
 
@@ -64,6 +65,7 @@ impl Default for Config {
                 template_path: "~/.cdd/kotlin".to_string(),
                 project_path: "./kotlin".to_string(),
                 component_file: "src/api/models.kt".to_string(),
+                routes_file: "src/api/routes.kt".to_string(),
             },
         );
 
@@ -75,6 +77,7 @@ impl Default for Config {
                 template_path: "~/.cdd/iOS".to_string(),
                 project_path: "./iOS".to_string(),
                 component_file: "cddTemplate/Source/API/APIModels.swift".to_string(),
+                routes_file: "cddTemplate/Source/API/APIRoutes.swift".to_string(),
             },
         );
         Config {

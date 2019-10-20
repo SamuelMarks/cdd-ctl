@@ -6,8 +6,6 @@ mod variable;
 pub use variable::*;
 mod request;
 use crate::project::request::Method::*;
-use log::*;
-use openapiv3::ParameterSchemaOrContent::Schema;
 use openapiv3::*;
 pub use request::*;
 use std::collections::HashMap;

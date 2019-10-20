@@ -10,6 +10,7 @@ pub(crate) struct CDDService {
     pub template_path: String,
     pub project_path: String,
     pub component_file: String,
+    pub routes_file: String,
 }
 
 impl CDDService {
@@ -91,7 +92,7 @@ impl CDDService {
     }
 
     pub fn route_files(&self) -> String {
-        [self.project_path.clone(), self.component_file.clone()].join("/")
+        [self.project_path.clone(), self.routes_file.clone()].join("/")
     }
 
     pub fn extract_models(&self) -> CliResult<Vec<Model>> {
