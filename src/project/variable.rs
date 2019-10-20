@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, PartialEq, Clone, Deserialize, Serialize)]
 pub struct Variable {
     pub name: String,
-    #[serde(rename(serialize = "type"))]
+    #[serde(rename = "type")]
     pub variable_type: VariableType,
     pub optional: bool,
     pub value: Option<String>,
@@ -11,16 +11,16 @@ pub struct Variable {
 
 #[derive(Debug, PartialEq, Clone, Deserialize, Serialize)]
 pub enum VariableType {
-    #[serde(rename(serialize = "String"))]
+    #[serde(rename = "String")]
     StringType,
-    #[serde(rename(serialize = "Int"))]
+    #[serde(rename = "Int")]
     IntType,
-    #[serde(rename(serialize = "Bool"))]
+    #[serde(rename = "Bool")]
     BoolType,
-    #[serde(rename(serialize = "Float"))]
+    #[serde(rename = "Float")]
     FloatType,
-    #[serde(rename(serialize = "Array"))]
+    #[serde(rename = "Array")]
     ArrayType(Box<VariableType>),
-    #[serde(rename(serialize = "Complex"))]
+    #[serde(rename = "Complex")]
     ComplexType(String),
 }
