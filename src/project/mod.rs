@@ -26,7 +26,7 @@ pub struct Info {
 
 impl Project {
     pub fn parse_model(name: String, schema: openapiv3::Schema) -> Model {
-        let mut fields: Vec<Box<Variable>> = vec![];
+        let mut vars: Vec<Box<Variable>> = vec![];
         if let openapiv3::SchemaKind::Any(any_schema) = schema.schema_kind {
             for (name, reference) in any_schema.properties {
                 let optional = any_schema.required.contains(&name);
@@ -38,10 +38,10 @@ impl Project {
                     value: None,
                 };
 
-                fields.push(Box::new(variable));
+                vars.push(Box::new(variable));
             }
         }
-        Model { name, fields }
+        Model { name, vars }
     }
 
     fn parse_parameter_data(data: ParameterData) -> Variable {
@@ -176,7 +176,7 @@ impl Project {
             match path {
                 ReferenceOr::Item(path_item) => {
                     for (operation, method) in path_item.path_to_request() {
-                        let mut fields: Vec<Box<Variable>> = vec![];
+                        let mut vars: Vec<Box<Variable>> = vec![];
 
                         for ref_or_parameter in operation.parameters {
                             if let ReferenceOr::Item(parameter) = ref_or_parameter {
@@ -187,7 +187,7 @@ impl Project {
                                         style,
                                         allow_empty_value,
                                     } => {
-                                        fields.push(Box::new(Project::parse_parameter_data(
+                                        vars.push(Box::new(Project::parse_parameter_data(
                                             parameter_data,
                                         )));
                                     }
@@ -195,7 +195,7 @@ impl Project {
                                         parameter_data,
                                         style,
                                     } => {
-                                        fields.push(Box::new(Project::parse_parameter_data(
+                                        vars.push(Box::new(Project::parse_parameter_data(
                                             parameter_data,
                                         )));
                                     }
@@ -222,7 +222,7 @@ impl Project {
                         let name = "randomName".to_string();
                         let request = Request {
                             name,
-                            fields,
+                            vars,
                             method,
                             response_type,
                             error_type,
