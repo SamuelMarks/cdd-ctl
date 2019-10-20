@@ -10,7 +10,7 @@ pub(crate) struct CDDService {
     pub template_path: String,
     pub project_path: String,
     pub component_file: String,
-    pub routes_file: String,
+    pub requests_file: String,
 }
 
 impl CDDService {
@@ -91,8 +91,8 @@ impl CDDService {
         [self.project_path.clone(), self.component_file.clone()].join("/")
     }
 
-    pub fn route_files(&self) -> String {
-        [self.project_path.clone(), self.routes_file.clone()].join("/")
+    pub fn request_files(&self) -> String {
+        [self.project_path.clone(), self.requests_file.clone()].join("/")
     }
 
     pub fn extract_models(&self) -> CliResult<Vec<Model>> {
@@ -102,8 +102,8 @@ impl CDDService {
     }
 
     pub fn extract_requests(&self) -> CliResult<Vec<Request>> {
-        info!("Extracting requests from {}", self.model_files());
-        self.exec(vec!["list-requests", &self.model_files()])
+        info!("Extracting requests from {}", self.request_files());
+        self.exec(vec!["list-requests", &self.request_files()])
             .and_then(|json| Ok(serde_json::from_str::<Vec<Request>>(&json)?))
     }
 
@@ -120,7 +120,7 @@ impl CDDService {
         info!("Inserting/Updating request {}", request.name);
         Ok(self.exec(vec![
             "update-request",
-            &self.route_files(),
+            &self.request_files(),
             &serde_json::to_string(&request)?,
         ])?)
     }
@@ -132,7 +132,7 @@ impl CDDService {
 
     pub fn delete_request(&self, name: &str) -> CliResult<String> {
         warn!("Deleting request {}", name);
-        self.exec(vec!["delete-request", &self.route_files(), name])
+        self.exec(vec!["delete-request", &self.request_files(), name])
     }
 
     // pub fn model_names(&self) -> CliResult<Vec<String>> {
