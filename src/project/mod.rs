@@ -120,7 +120,7 @@ impl Project {
     }
 
     pub fn parse_yml(open_api: OpenAPI) -> Self {
-        println!("{}", open_api.info.title);
+        // println!("{}", open_api.info.title);
         //Parse INFO
         let mut project = Project {
             info: Info {
@@ -236,7 +236,7 @@ impl Project {
             };
         }
 
-        println!("{:?}", project);
+        // println!("{:?}", project);
 
         return project;
     }
