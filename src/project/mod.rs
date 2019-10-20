@@ -172,7 +172,7 @@ impl Project {
 
         //Parse Requests
 
-        for (name, path) in open_api.paths {
+        for (url_path, path) in open_api.paths {
             match path {
                 ReferenceOr::Item(path_item) => {
                     for (operation, method) in path_item.path_to_request() {
@@ -223,6 +223,7 @@ impl Project {
                         let request = Request {
                             name,
                             vars,
+                            path: url_path.to_string(),
                             method,
                             response_type,
                             error_type,

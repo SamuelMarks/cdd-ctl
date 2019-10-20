@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, PartialEq, Clone, Deserialize, Serialize)]
 pub struct Request {
     pub name: String,
+    pub path: String,
     pub vars: Vec<Box<Variable>>,
     pub method: Method,
     pub response_type: String,
