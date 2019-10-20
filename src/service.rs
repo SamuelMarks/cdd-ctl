@@ -42,12 +42,13 @@ impl CDDService {
             let model_name = &model.name;
             if project_model_names.contains(model_name) {
                 info!("Model {} was found in project", model_name);
+                self.update_model(model.clone())?;
             } else {
                 warn!(
                     "Model {} was not found in project, inserting...",
                     &model_name
                 );
-                self.insert_or_update_model(model.clone())?;
+                self.insert_model(model.clone())?;
             }
         }
 
@@ -62,12 +63,13 @@ impl CDDService {
             let request_name = &request.name;
             if project_request_names.contains(request_name) {
                 info!("Request {} was found in project", request_name);
+                self.update_request(request.clone())?;
             } else {
                 warn!(
                     "Request {} was not found in project, inserting...",
                     &request_name
                 );
-                self.insert_or_update_request(request.clone())?;
+                self.insert_request(request.clone())?;
             }
         }
 
@@ -107,8 +109,26 @@ impl CDDService {
             .and_then(|json| Ok(serde_json::from_str::<Vec<Request>>(&json)?))
     }
 
-    pub fn insert_or_update_model(&self, model: Model) -> CliResult<String> {
-        info!("Inserting/Updating model {}", model.name);
+    pub fn insert_model(&self, model: Model) -> CliResult<String> {
+        info!("Inserting model {}", model.name);
+        Ok(self.exec(vec![
+            "insert-model",
+            &self.model_files(),
+            &serde_json::to_string(&model)?,
+        ])?)
+    }
+
+    pub fn insert_request(&self, request: Request) -> CliResult<String> {
+        info!("Inserting request {}", request.name);
+        Ok(self.exec(vec![
+            "insert-request",
+            &self.request_files(),
+            &serde_json::to_string(&request)?,
+        ])?)
+    }
+
+    pub fn update_model(&self, model: Model) -> CliResult<String> {
+        info!("Updating model {}", model.name);
         Ok(self.exec(vec![
             "update-model",
             &self.model_files(),
@@ -116,8 +136,8 @@ impl CDDService {
         ])?)
     }
 
-    pub fn insert_or_update_request(&self, request: Request) -> CliResult<String> {
-        info!("Inserting/Updating request {}", request.name);
+    pub fn update_request(&self, request: Request) -> CliResult<String> {
+        info!("Updating request {}", request.name);
         Ok(self.exec(vec![
             "update-request",
             &self.request_files(),
