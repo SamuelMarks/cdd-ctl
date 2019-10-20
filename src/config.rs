@@ -64,8 +64,8 @@ impl Default for Config {
                 bin_path: "~/.cdd/services/cdd-kotlin".to_string(),
                 template_path: "~/.cdd/kotlin".to_string(),
                 project_path: "./kotlin".to_string(),
-                component_file: "src/api/models.kt".to_string(),
-                routes_file: "src/api/routes.kt".to_string(),
+                component_file: "API/Models.kt".to_string(),
+                routes_file: "API/Routes.kt".to_string(),
             },
         );
 

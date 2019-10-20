@@ -3,7 +3,7 @@ use config::*;
 use log::*;
 use std::path::PathBuf;
 
-pub fn init(_path: PathBuf) -> CliResult<()> {
+pub fn init(name: String) -> CliResult<()> {
     let _ = init_config_file()?;
     let _ = copy_openapi_spec()?;
 

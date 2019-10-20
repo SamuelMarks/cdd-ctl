@@ -9,8 +9,8 @@ enum Command {
         about = "Initializes a new project configuration file and OpenAPI spec"
     )]
     Init {
-        #[structopt(help = "", parse(from_os_str), name = "config")]
-        path: PathBuf,
+        #[structopt(help = "", name = "name")]
+        name: String,
     },
 
     // #[structopt(
@@ -51,7 +51,7 @@ pub fn run() -> CliResult<()> {
     // log::info!("Successfully read configuration file.");
 
     match opt.cmd {
-        Command::Init { path } => crate::commands::init(path),
+        Command::Init { name } => crate::commands::init(name),
         // Command::Regenerate => crate::commands::regenerate(),
         Command::Sync => crate::commands::sync(),
     }
