@@ -86,36 +86,52 @@ impl CDDService {
         })
     }
 
+    pub fn model_files(&self) -> String {
+        [self.project_path.clone(), self.component_file.clone()].join("/")
+    }
+
+    pub fn route_files(&self) -> String {
+        [self.project_path.clone(), self.component_file.clone()].join("/")
+    }
+
     pub fn extract_models(&self) -> CliResult<Vec<Model>> {
-        info!("Extracting models from {}", self.component_file);
-        self.exec(vec!["list-models", &self.component_file])
+        info!("Extracting models from {}", self.model_files());
+        self.exec(vec!["list-models", &self.model_files()])
             .and_then(|json| Ok(serde_json::from_str::<Vec<Model>>(&json)?))
     }
 
     pub fn extract_requests(&self) -> CliResult<Vec<Request>> {
-        info!("Extracting requests from {}", self.component_file);
-        self.exec(vec!["list-requests", &self.component_file])
+        info!("Extracting requests from {}", self.model_files());
+        self.exec(vec!["list-requests", &self.model_files()])
             .and_then(|json| Ok(serde_json::from_str::<Vec<Request>>(&json)?))
     }
 
     pub fn insert_or_update_model(&self, model: Model) -> CliResult<String> {
         info!("Inserting/Updating model {}", model.name);
-        Ok(self.exec(vec!["update-model", &serde_json::to_string(&model)?])?)
+        Ok(self.exec(vec![
+            "update-model",
+            &self.model_files(),
+            &serde_json::to_string(&model)?,
+        ])?)
     }
 
     pub fn insert_or_update_request(&self, request: Request) -> CliResult<String> {
         info!("Inserting/Updating request {}", request.name);
-        Ok(self.exec(vec!["update-request", &serde_json::to_string(&request)?])?)
+        Ok(self.exec(vec![
+            "update-request",
+            &self.route_files(),
+            &serde_json::to_string(&request)?,
+        ])?)
     }
 
     pub fn delete_model(&self, name: &str) -> CliResult<String> {
         warn!("Deleting model {}", name);
-        self.exec(vec!["delete-model", name])
+        self.exec(vec!["delete-model", &self.model_files(), name])
     }
 
     pub fn delete_request(&self, name: &str) -> CliResult<String> {
         warn!("Deleting request {}", name);
-        self.exec(vec!["delete-request", name])
+        self.exec(vec!["delete-request", &self.route_files(), name])
     }
 
     // pub fn model_names(&self) -> CliResult<Vec<String>> {

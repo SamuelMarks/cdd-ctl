@@ -3,7 +3,7 @@ use log::*;
 use std::process::Command;
 
 pub fn exec(cmd: &str, args: Vec<&str>) -> CliResult<String> {
-    info!("CMD: {:?} {:?}", cmd, args);
+    info!("CMD: {} {}", cmd, args.join(" "));
 
     let output = Command::new(cmd).args(&args).output()?;
 
