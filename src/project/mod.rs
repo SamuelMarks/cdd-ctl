@@ -219,7 +219,7 @@ impl Project {
                             .map(|response| Project::parse_response(response.clone()))
                             .unwrap_or("".to_string());
 
-                        let name = format!("{}{}_request", &url_path, &method);
+                        let name = format!("{}{}_request", &url_path, &method).replace("/","").replace("{","").replace("}","");
                         
                         let request = Request {
                             name,
