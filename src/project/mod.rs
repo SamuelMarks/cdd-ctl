@@ -146,7 +146,7 @@ impl Project {
             Err(err) => {}
         };
 
-        let mut arrTypes = HashMap::new();
+        let mut arr_types = HashMap::new();
         //Parse models
 
         let components = open_api.components.unwrap();
@@ -157,7 +157,7 @@ impl Project {
                         if let Type::Array(array_type) = type_ {
                             let item_type = Project::parse_type(array_type.items.unbox());
                             if let VariableType::ComplexType(reference) = item_type {
-                                arrTypes.insert(name.clone(), reference);
+                                arr_types.insert(name.clone(), reference);
                                 // println!("---------{}", arrTypes);
                             }
                         };
@@ -209,17 +209,39 @@ impl Project {
                             .responses
                             .default
                             .map(|default_response| Project::parse_response(default_response))
-                            .unwrap_or("".to_string());
+                            .map( |response|
+                                 if response.chars().count() == 0 {
+                                    "ResponceEmpty".to_string()
+                                } else {
+                                    response
+                                }
+                            )
+                            .unwrap_or("ResponceEmpty".to_string());
 
-                        let response_type = operation
+                        
+                        let mut response_type = operation
                             .responses
                             .responses
                             .values()
                             .next()
                             .map(|response| Project::parse_response(response.clone()))
-                            .unwrap_or("".to_string());
+                            .map( |response|
+                                if response.chars().count() == 0 {
+                                    "ResponceEmpty".to_string()
+                                } else {
+                                    response
+                                }
+                             
+                            )
+                            .unwrap_or("ResponceEmpty".to_string());
+                            
+                        if arr_types.contains_key(&response_type) {
+                            println!("LOL");
+                            response_type = format!("[{}]", arr_types[&response_type].clone());
+                            // println!("{}",arr_types[&response_type].clone());
+                        }
 
-                        let name = format!("{}{}_request", &url_path, &method).replace("/","").replace("{","").replace("}","");
+                        let name = format!("{}{}request", &url_path, &method).replace("/","").replace("{","").replace("}","");
                         
                         let request = Request {
                             name,
