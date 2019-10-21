@@ -153,21 +153,23 @@ impl Project {
         for (name, schema) in components.schemas {
             match schema {
                 ReferenceOr::Item(schema) => {
+                    let mut is_array_type = false;
                     if let openapiv3::SchemaKind::Type(type_) = schema.schema_kind.clone() {
                         if let Type::Array(array_type) = type_ {
                             let item_type = Project::parse_type(array_type.items.unbox());
                             if let VariableType::ComplexType(reference) = item_type {
                                 arr_types.insert(name.clone(), reference);
-                                // println!("---------{}", arrTypes);
+                                is_array_type = true
                             }
                         };
                     }
-
-                    let model = Project::parse_model(name, schema);
-                    project.models.push(model);
-                }
-                ReferenceOr::Reference { reference } => {} //Need to implement
-            }
+                    if !is_array_type {
+                        let model = Project::parse_model(name, schema);
+                        project.models.push(model);
+                    }
+                },
+                ReferenceOr::Reference { reference } => {}, //Need to implement
+            };
         }
 
         //Parse Requests
