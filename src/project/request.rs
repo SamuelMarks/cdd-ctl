@@ -29,4 +29,27 @@ pub enum Method {
     Patch_,
     #[serde(rename = "TRACE")]
     Trace_,
+
+}
+impl Method {
+    pub fn string(self) -> String {
+        match self {
+            Get_ => "GET".to_string(),
+            Post_ => "POST".to_string(),
+            Put_ => "PUT".to_string(),
+            Delete_ => "DELETE".to_string(),
+            Options_ => "OPTIONS".to_string(),
+            Head_ => "HEAD".to_string(),
+            Patch_ => "PATCH".to_string(),
+            Trace_ => "TRACE".to_string()
+        }
+    }
+}
+
+impl std::fmt::Display for Method {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+        // or, alternatively:
+        // fmt::Debug::fmt(self, f)
+    }
 }

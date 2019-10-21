@@ -79,13 +79,13 @@ impl Project {
                         .schema
                         .clone()
                         .map(|schema| match schema {
-                            ReferenceOr::Reference { reference } => reference,
+                            ReferenceOr::Reference { reference } => reference.split("/").last().unwrap_or("").to_string(),
                             _ => "".to_string(),
                         })
                         .unwrap_or("".to_string())
                 })
                 .unwrap_or("".to_string()),
-            ReferenceOr::Reference { reference } => reference,
+            ReferenceOr::Reference { reference } => reference.split("/").last().unwrap_or("").to_string(),
         }
     }
 
@@ -219,7 +219,8 @@ impl Project {
                             .map(|response| Project::parse_response(response.clone()))
                             .unwrap_or("".to_string());
 
-                        let name = "randomName".to_string();
+                        let name = format!("{}{}_request", &url_path, &method);
+                        
                         let request = Request {
                             name,
                             vars,
