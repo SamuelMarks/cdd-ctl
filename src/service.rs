@@ -108,7 +108,11 @@ impl CDDService {
     pub fn extract_models(&self) -> CliResult<Vec<Model>> {
         info!("Extracting models from {}", self.model_files());
         self.exec(vec!["list-models", &self.model_files()])
-            .and_then(|json| Ok(serde_json::from_str::<Vec<Model>>(&json)?))
+            .and_then(|json| {
+                Ok(serde_json::from_str::<Vec<Model>>(&json).map_err(|e| {
+                    failure::format_err!("Error parsing JSON result: {}\n{}", e, json)
+                })?)
+            })
     }
 
     pub fn extract_requests(&self) -> CliResult<Vec<Request>> {

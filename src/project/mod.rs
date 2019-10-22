@@ -79,13 +79,17 @@ impl Project {
                         .schema
                         .clone()
                         .map(|schema| match schema {
-                            ReferenceOr::Reference { reference } => reference.split("/").last().unwrap_or("").to_string(),
+                            ReferenceOr::Reference { reference } => {
+                                reference.split("/").last().unwrap_or("").to_string()
+                            }
                             _ => "".to_string(),
                         })
                         .unwrap_or("".to_string())
                 })
                 .unwrap_or("".to_string()),
-            ReferenceOr::Reference { reference } => reference.split("/").last().unwrap_or("").to_string(),
+            ReferenceOr::Reference { reference } => {
+                reference.split("/").last().unwrap_or("").to_string()
+            }
         }
     }
 
@@ -167,8 +171,8 @@ impl Project {
                         let model = Project::parse_model(name, schema);
                         project.models.push(model);
                     }
-                },
-                ReferenceOr::Reference { reference } => {}, //Need to implement
+                }
+                ReferenceOr::Reference { reference } => {} //Need to implement
             };
         }
 
@@ -211,40 +215,38 @@ impl Project {
                             .responses
                             .default
                             .map(|default_response| Project::parse_response(default_response))
-                            .map( |response|
-                                 if response.chars().count() == 0 {
+                            .map(|response| {
+                                if response.chars().count() == 0 {
                                     "ResponceEmpty".to_string()
                                 } else {
                                     response
                                 }
-                            )
+                            })
                             .unwrap_or("ResponceEmpty".to_string());
 
-                        
                         let mut response_type = operation
                             .responses
                             .responses
                             .values()
                             .next()
                             .map(|response| Project::parse_response(response.clone()))
-                            .map( |response|
+                            .map(|response| {
                                 if response.chars().count() == 0 {
                                     "ResponceEmpty".to_string()
                                 } else {
                                     response
                                 }
-                             
-                            )
+                            })
                             .unwrap_or("ResponceEmpty".to_string());
-                            
                         if arr_types.contains_key(&response_type) {
-                            println!("LOL");
                             response_type = format!("[{}]", arr_types[&response_type].clone());
                             // println!("{}",arr_types[&response_type].clone());
                         }
 
-                        let name = format!("{}{}request", &url_path, &method).replace("/","").replace("{","").replace("}","");
-                        
+                        let name = format!("{}{}request", &url_path, &method)
+                            .replace("/", "")
+                            .replace("{", "")
+                            .replace("}", "");
                         let request = Request {
                             name,
                             vars,
