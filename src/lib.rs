@@ -5,6 +5,7 @@ mod error;
 mod logger;
 mod project;
 mod project_graph;
+mod schema;
 mod service;
 mod util;
 

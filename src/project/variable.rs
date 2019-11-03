@@ -24,3 +24,16 @@ pub enum VariableType {
     #[serde(rename = "Complex")]
     ComplexType(String),
 }
+
+impl VariableType {
+    pub fn to_mysql(&self) -> String {
+        match self {
+            VariableType::StringType => "TEXT",
+            VariableType::IntType => "INT",
+            VariableType::BoolType => "TINYINT",
+            VariableType::FloatType => "INT",
+            _ => "TEXT",
+        }
+        .to_string()
+    }
+}

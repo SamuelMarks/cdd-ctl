@@ -55,7 +55,7 @@ impl Project {
                     value: None,
                 }
             }
-            ParameterSchemaOrContent::Content(content) => {
+            ParameterSchemaOrContent::Content(_content) => {
                 //Need to implement
                 Variable {
                     name: data.name,
@@ -80,15 +80,15 @@ impl Project {
                         .clone()
                         .map(|schema| match schema {
                             ReferenceOr::Reference { reference } => {
-                                reference.split("/").last().unwrap_or("").to_string()
+                                reference.split('/').last().unwrap_or("").to_string()
                             }
                             _ => "".to_string(),
                         })
-                        .unwrap_or("".to_string())
+                        .unwrap_or_else(|| "".to_string())
                 })
-                .unwrap_or("".to_string()),
+                .unwrap_or_else(|| "".to_string()),
             ReferenceOr::Reference { reference } => {
-                reference.split("/").last().unwrap_or("").to_string()
+                reference.split('/').last().unwrap_or("").to_string()
             }
         }
     }
@@ -96,16 +96,16 @@ impl Project {
     fn parse_type(reference: ReferenceOr<openapiv3::Schema>) -> VariableType {
         match reference {
             ReferenceOr::Reference { reference } => {
-                VariableType::ComplexType(reference.split("/").last().unwrap_or("").to_string())
+                VariableType::ComplexType(reference.split('/').last().unwrap_or("").to_string())
             }
             ReferenceOr::Item(schema) => {
                 match &schema.schema_kind {
                     openapiv3::SchemaKind::Type(t) => {
                         match t {
-                            Type::String(val) => VariableType::StringType,
-                            Type::Number(val) => VariableType::FloatType,
-                            Type::Integer(val) => VariableType::IntType,
-                            Type::Object(val) => {
+                            Type::String(_) => VariableType::StringType,
+                            Type::Number(_) => VariableType::FloatType,
+                            Type::Integer(_) => VariableType::IntType,
+                            Type::Object(_) => {
                                 VariableType::ComplexType("Need to implement".to_string())
                             } //Need to implement
                             Type::Array(val) => {
@@ -136,18 +136,16 @@ impl Project {
             .servers
             .first()
             .map(|s| s.url.clone())
-            .unwrap_or("".to_string());
+            .unwrap_or_else(|| "".to_string());
         let res = Url::parse(url.as_str());
-        match res {
-            Ok(url) => {
-                let scheme = url.scheme().to_string();
-                let host = url.host_str().unwrap_or("");
-                project.info = Info {
-                    host: (scheme + "://" + host),
-                    endpoint: url.path().to_string(),
-                }
+
+        if let Ok(url) = res {
+            let scheme = url.scheme().to_string();
+            let host = url.host_str().unwrap_or("");
+            project.info = Info {
+                host: (scheme + "://" + host),
+                endpoint: url.path().to_string(),
             }
-            Err(err) => {}
         };
 
         let mut arr_types = HashMap::new();
@@ -155,116 +153,102 @@ impl Project {
 
         let components = open_api.components.unwrap();
         for (name, schema) in components.schemas {
-            match schema {
-                ReferenceOr::Item(schema) => {
-                    let mut is_array_type = false;
-                    if let openapiv3::SchemaKind::Type(type_) = schema.schema_kind.clone() {
-                        if let Type::Array(array_type) = type_ {
-                            let item_type = Project::parse_type(array_type.items.unbox());
-                            if let VariableType::ComplexType(reference) = item_type {
-                                arr_types.insert(name.clone(), reference);
-                                is_array_type = true
-                            }
-                        };
-                    }
-                    if !is_array_type {
-                        let model = Project::parse_model(name, schema);
-                        project.models.push(model);
-                    }
+            if let ReferenceOr::Item(schema) = schema {
+                let mut is_array_type = false;
+                if let openapiv3::SchemaKind::Type(type_) = schema.schema_kind.clone() {
+                    if let Type::Array(array_type) = type_ {
+                        let item_type = Project::parse_type(array_type.items.unbox());
+                        if let VariableType::ComplexType(reference) = item_type {
+                            arr_types.insert(name.clone(), reference);
+                            is_array_type = true
+                        }
+                    };
                 }
-                ReferenceOr::Reference { reference } => {} //Need to implement
-            };
+                if !is_array_type {
+                    let model = Project::parse_model(name, schema);
+                    project.models.push(model);
+                }
+            }
         }
 
         //Parse Requests
-
         for (url_path, path) in open_api.paths {
-            match path {
-                ReferenceOr::Item(path_item) => {
-                    for (operation, method) in path_item.path_to_request() {
-                        let mut vars: Vec<Box<Variable>> = vec![];
+            if let ReferenceOr::Item(path_item) = path {
+                for (operation, method) in path_item.path_to_request() {
+                    let mut vars: Vec<Box<Variable>> = vec![];
 
-                        for ref_or_parameter in operation.parameters {
-                            if let ReferenceOr::Item(parameter) = ref_or_parameter {
-                                match parameter {
-                                    Parameter::Query {
+                    for ref_or_parameter in operation.parameters {
+                        if let ReferenceOr::Item(parameter) = ref_or_parameter {
+                            match parameter {
+                                Parameter::Query {
+                                    parameter_data,
+                                    allow_reserved,
+                                    style,
+                                    allow_empty_value,
+                                } => {
+                                    vars.push(Box::new(Project::parse_parameter_data(
                                         parameter_data,
-                                        allow_reserved,
-                                        style,
-                                        allow_empty_value,
-                                    } => {
-                                        vars.push(Box::new(Project::parse_parameter_data(
-                                            parameter_data,
-                                        )));
-                                    }
-                                    Parameter::Path {
-                                        parameter_data,
-                                        style,
-                                    } => {
-                                        vars.push(Box::new(Project::parse_parameter_data(
-                                            parameter_data,
-                                        )));
-                                    }
-
-                                    _ => {} //Need to finish
+                                    )));
                                 }
+                                Parameter::Path {
+                                    parameter_data,
+                                    style,
+                                } => {
+                                    vars.push(Box::new(Project::parse_parameter_data(
+                                        parameter_data,
+                                    )));
+                                }
+
+                                _ => {} //Need to finish
                             }
                         }
-
-                        let error_type = operation
-                            .responses
-                            .default
-                            .map(|default_response| Project::parse_response(default_response))
-                            .map(|response| {
-                                if response.chars().count() == 0 {
-                                    "ResponceEmpty".to_string()
-                                } else {
-                                    response
-                                }
-                            })
-                            .unwrap_or("ResponceEmpty".to_string());
-
-                        let mut response_type = operation
-                            .responses
-                            .responses
-                            .values()
-                            .next()
-                            .map(|response| Project::parse_response(response.clone()))
-                            .map(|response| {
-                                if response.chars().count() == 0 {
-                                    "ResponceEmpty".to_string()
-                                } else {
-                                    response
-                                }
-                            })
-                            .unwrap_or("ResponceEmpty".to_string());
-                        if arr_types.contains_key(&response_type) {
-                            response_type = format!("[{}]", arr_types[&response_type].clone());
-                            // println!("{}",arr_types[&response_type].clone());
-                        }
-
-                        let name = format!("{}{}request", &url_path, &method)
-                            .replace("/", "")
-                            .replace("{", "")
-                            .replace("}", "");
-                        let request = Request {
-                            name,
-                            vars,
-                            path: url_path.to_string(),
-                            method,
-                            response_type,
-                            error_type,
-                        };
-                        project.requests.push(request);
                     }
+
+                    let error_type = operation
+                        .responses
+                        .default
+                        .map(Project::parse_response)
+                        .unwrap_or_else(|| "ResponseEmpty".to_string());
+
+                    let mut response_type = operation
+                        .responses
+                        .responses
+                        .values()
+                        .next()
+                        .map(|response| Project::parse_response(response.clone()))
+                        .map(|response| {
+                            if response.chars().count() == 0 {
+                                "ResponceEmpty".to_string()
+                            } else {
+                                response
+                            }
+                        })
+                        .unwrap_or_else(|| "ResponceEmpty".to_string());
+                    if arr_types.contains_key(&response_type) {
+                        response_type = format!("[{}]", arr_types[&response_type].clone());
+                        // println!("{}",arr_types[&response_type].clone());
+                    }
+
+                    let name = format!("{}{}request", &url_path, &method)
+                        .replace("/", "")
+                        .replace("{", "")
+                        .replace("}", "");
+                    let request = Request {
+                        name,
+                        vars,
+                        path: url_path.to_string(),
+                        method,
+                        response_type,
+                        error_type,
+                    };
+                    project.requests.push(request);
                 }
-                _ => {} //Need to implement
             };
         }
 
         // println!("{:?}", project);
 
-        return project;
+        project
     }
 }
 
@@ -285,13 +269,10 @@ impl Additional for PathItem {
             (mm.trace, Trace_),
         ];
 
-        let mut res: Vec<(Operation, Method)> = arr
-            .into_iter()
+        arr.into_iter()
             .filter(|i| i.0.is_some())
             .map(|i| (i.0.unwrap(), i.1))
-            .collect();
-
-        res
+            .collect()
     }
 }
 
@@ -300,110 +281,11 @@ pub trait CustomIterators {
 }
 impl CustomIterators for Vec<Model> {
     fn all_names(&self) -> Vec<String> {
-        self.into_iter().map(|model| model.name.clone()).collect()
+        self.iter().map(|model| model.name.clone()).collect()
     }
 }
 impl CustomIterators for Vec<Request> {
     fn all_names(&self) -> Vec<String> {
-        self.into_iter()
-            .map(|request| request.name.clone())
-            .collect()
+        self.iter().map(|request| request.name.clone()).collect()
     }
 }
-
-// impl From<openapiv3::OpenAPI> for Project {
-//     fn from(openapi: openapiv3::OpenAPI) -> Self {
-//         info!("Extracting objects from OpenAPI spec");
-//         let mut models = Vec::new();
-//         let mut requests = Vec::new();
-
-//         for component in openapi.components {
-//             for (name, reference) in component.schemas {
-//                 println!("class found: {}", name);
-
-//                 if let openapiv3::ReferenceOr::Item(schema) = reference {
-//                     if let openapiv3::SchemaKind::Any(schema_kind) = schema.schema_kind {
-//                         // variables are here:
-//                         for (name, property) in schema_kind.properties {
-//                             println!("found variable: {}", name);
-//                             // println!("{:#}", property);
-//                             read_variable(name, property);
-//                         }
-//                     }
-//                 }
-//             }
-//         }
-
-//         for (path, item) in openapi.paths {
-//             if let openapiv3::ReferenceOr::Item(item) = item {
-//                 fn make_route(
-//                     method: &str,
-//                     url_path: &str,
-//                     operation: &openapiv3::Operation,
-//                 ) -> Request {
-//                     Request {
-//                         method: Method::Get_,
-//                         error_type: "".to_string(),
-//                         response_type: "".to_string(),
-//                         url: Url::new(),
-//                         vars: Vec::new(),
-//                     }
-//                 }
-
-//                 if let Some(operation) = item.get {
-//                     // println!("GET: {:#?}", operation);
-//                     requests.push(make_route("GET", &path, &operation));
-//                 }
-//                 if let Some(operation) = item.put {
-//                     requests.push(make_route("PUT", &path, &operation));
-//                 }
-//                 if let Some(operation) = item.post {
-//                     requests.push(make_route("POST", &path, &operation));
-//                 }
-//                 if let Some(operation) = item.delete {
-//                     requests.push(make_route("DELETE", &path, &operation));
-//                 }
-//             }
-//         }
-
-//         Project {
-//             models,
-//             requests,
-//             info: Info {
-//                 endpoint: "".to_string(),
-//                 host: "".to_string(),
-//             },
-//         }
-//     }
-// }
-
-// use crate::*;
-// use openapiv3::*;
-
-// fn read_variable(
-//     name: std::string::String,
-//     schema: ReferenceOr<std::boxed::Box<openapiv3::Schema>>,
-// ) -> CliResult<Variable> {
-//     // println!("schema: {:#?}", schema);
-//     if let ReferenceOr::Item(schema) = schema {
-//         let required = schema.schema_data.nullable;
-//         let constant = schema.schema_data.read_only;
-
-//         println!("schema: {:#?}", schema);
-
-//         if let openapiv3::SchemaKind::Type(var_type) = schema.schema_kind {
-//             println!("schema_kind: {:#?}", var_type);
-
-//             let vartype = match var_type {
-//                 openapiv3::Type::Integer { .. } => "Int64",
-//                 _ => "Unknown",
-//             };
-
-//             return Ok(Variable {});
-//         }
-//         // let vartype = match schema. {
-//         //     openapiv3::Type::Integer { .. } => "Int64",
-//         //     _ => "Unknown",
-//         // };
-//     }
-// }

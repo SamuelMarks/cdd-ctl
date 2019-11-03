@@ -39,6 +39,11 @@ impl ProjectGraph {
             service.sync_with(&spec_graph)?;
         }
 
+        util::write_file(
+            PathBuf::from("schema.sql"),
+            &schema::generate("schema.sql", spec_graph),
+        )?;
+
         Ok(())
     }
 

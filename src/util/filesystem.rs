@@ -39,6 +39,10 @@ pub fn read_file(pathbuf: PathBuf) -> CliResult<String> {
     Ok(buffer)
 }
 
+pub fn write_file(pathbuf: PathBuf, content: &str) -> Result<(), failure::Error> {
+    Ok(std::fs::write(pathbuf, content)?)
+}
+
 pub fn copy_file<F: AsRef<Path>, T: AsRef<Path>>(from: F, to: T) -> CliResult<()> {
     Ok(fs::copy(from, to).map(|_| ())?)
 }
