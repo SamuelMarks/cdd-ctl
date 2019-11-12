@@ -47,10 +47,17 @@ impl Config {
 impl Default for Config {
     fn default() -> Self {
         let mut services = HashMap::new();
+
+        #[cfg(target_os = "macos")]
+        let bin_path = "~/.cdd/bin/darwin";
+
+        #[cfg(target_os = "linux")]
+        let bin_path = "~/.cdd/bin/linux";
+
         services.insert(
             "rust".to_string(),
             CDDService {
-                bin_path: "~/.cdd/services/cdd-rust".to_string(),
+                bin_path: format!("{}/cdd-rust", bin_path),
                 template_path: "~/.cdd/templates/rust".to_string(),
                 project_path: "./rust".to_string(),
                 component_file: "src/api/models.rs".to_string(),
@@ -61,7 +68,7 @@ impl Default for Config {
         services.insert(
             "typescript".to_string(),
             CDDService {
-                bin_path: "~/.cdd/services/cdd-typescript".to_string(),
+                bin_path: format!("{}/cdd-rust", bin_path),
                 template_path: "~/.cdd/templates/typescript".to_string(),
                 project_path: "./typescript".to_string(),
                 component_file: "API/Models.ts".to_string(),
@@ -72,7 +79,7 @@ impl Default for Config {
         services.insert(
             "kotlin".to_string(),
             CDDService {
-                bin_path: "~/.cdd/services/cdd-kotlin".to_string(),
+                bin_path: format!("{}/cdd-rust", bin_path),
                 template_path: "~/.cdd/templates/kotlin".to_string(),
                 project_path: "./kotlin".to_string(),
                 component_file: "API/Models.kt".to_string(),
@@ -84,7 +91,7 @@ impl Default for Config {
         services.insert(
             "ios".to_string(),
             CDDService {
-                bin_path: "~/.cdd/services/cdd-swift".to_string(),
+                bin_path: format!("{}/cdd-rust", bin_path),
                 template_path: "~/.cdd/templates/iOS".to_string(),
                 project_path: "./iOS".to_string(),
                 component_file: "cddTemplate/Source/API/APIModels.swift".to_string(),
