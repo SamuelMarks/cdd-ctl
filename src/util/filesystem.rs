@@ -1,3 +1,5 @@
+
+
 use crate::*;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -58,9 +60,8 @@ pub fn copy_dir<F: AsRef<Path>, T: AsRef<Path>>(from: F, to: T) -> CliResult<()>
 // }
 
 pub fn home_dir() -> CliResult<PathBuf> {
-    Ok(dirs::home_dir().ok_or(failure::format_err!(
-        "There was a problem locating your home directory."
-    ))?)
+    Ok(dirs::home_dir()
+        .ok_or_else(|| failure::format_err!("There was a problem locating your home directory."))?)
 }
 
 pub fn expand_home_path(path: String) -> CliResult<String> {

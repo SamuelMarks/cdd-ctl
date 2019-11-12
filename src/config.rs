@@ -51,7 +51,7 @@ impl Default for Config {
             "rust".to_string(),
             CDDService {
                 bin_path: "~/.cdd/services/cdd-rust".to_string(),
-                template_path: "~/.cdd/rust".to_string(),
+                template_path: "~/.cdd/templates/rust".to_string(),
                 project_path: "./rust".to_string(),
                 component_file: "src/api/models.rs".to_string(),
                 requests_file: "src/api/routes.rs".to_string(),
@@ -59,10 +59,21 @@ impl Default for Config {
         );
 
         services.insert(
+            "typescript".to_string(),
+            CDDService {
+                bin_path: "~/.cdd/services/cdd-typescript".to_string(),
+                template_path: "~/.cdd/templates/typescript".to_string(),
+                project_path: "./typescript".to_string(),
+                component_file: "API/Models.ts".to_string(),
+                requests_file: "API/Requests.ts".to_string(),
+            },
+        );
+
+        services.insert(
             "kotlin".to_string(),
             CDDService {
                 bin_path: "~/.cdd/services/cdd-kotlin".to_string(),
-                template_path: "~/.cdd/kotlin".to_string(),
+                template_path: "~/.cdd/templates/kotlin".to_string(),
                 project_path: "./kotlin".to_string(),
                 component_file: "API/Models.kt".to_string(),
                 requests_file: "API/Requests.kt".to_string(),
@@ -74,7 +85,7 @@ impl Default for Config {
             "ios".to_string(),
             CDDService {
                 bin_path: "~/.cdd/services/cdd-swift".to_string(),
-                template_path: "~/.cdd/iOS".to_string(),
+                template_path: "~/.cdd/templates/iOS".to_string(),
                 project_path: "./iOS".to_string(),
                 component_file: "cddTemplate/Source/API/APIModels.swift".to_string(),
                 requests_file: "cddTemplate/Source/API/APIRequests.swift".to_string(),
