@@ -60,8 +60,8 @@ impl Default for Config {
                 bin_path: format!("{}/cdd-rust", bin_path),
                 template_path: "~/.cdd/templates/rust".to_string(),
                 project_path: "./rust".to_string(),
-                component_file: "src/api/models.rs".to_string(),
-                requests_file: "src/api/routes.rs".to_string(),
+                component_file: "src/models.rs".to_string(),
+                requests_file: "src/routes.rs".to_string(),
             },
         );
 

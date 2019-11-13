@@ -37,6 +37,7 @@ impl ProjectGraph {
         );
         for (_name, service) in self.config.services.clone() {
             service.sync_with(&spec_graph)?;
+            service.write_tests();
         }
 
         util::write_file(

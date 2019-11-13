@@ -84,6 +84,12 @@ impl CDDService {
         Ok(())
     }
 
+    pub fn write_tests(&self) -> CliResult<String> {
+        info!("Writing tests for {}", self.project_path);
+
+        Ok(self.exec(vec!["generate-tests"])?)
+    }
+
     pub fn extract_project(&self) -> CliResult<Project> {
         info!("Extracting objects from {}", self.project_path);
 
