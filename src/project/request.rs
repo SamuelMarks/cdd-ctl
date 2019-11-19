@@ -29,7 +29,6 @@ pub enum Method {
     Patch_,
     #[serde(rename = "TRACE")]
     Trace_,
-
 }
 impl Method {
     pub fn string(self) -> String {
@@ -41,7 +40,7 @@ impl Method {
             Options_ => "OPTIONS".to_string(),
             Head_ => "HEAD".to_string(),
             Patch_ => "PATCH".to_string(),
-            Trace_ => "TRACE".to_string()
+            Trace_ => "TRACE".to_string(),
         }
     }
 }
