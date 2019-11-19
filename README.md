@@ -1,5 +1,8 @@
 cdd-ctl
 =======
+[![Rust: nightly](https://img.shields.io/badge/Rust-nightly-blue.svg)](https://www.rust-lang.org)
+[![License: (Apache-2.0 OR MIT)](https://img.shields.io/badge/LICENSE-Apache--2.0%20OR%20MIT-orange)](LICENSE-APACHE)
+[![Build Status](https://travis-ci.org/offscale/cdd-ctl.svg?branch=master)](https://travis-ci.org/offscale/cdd-ctl)
 
 Compiler Driven Development (CDD) command-line interface.
 

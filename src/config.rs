@@ -79,7 +79,7 @@ impl Default for Config {
         services.insert(
             "kotlin".to_string(),
             CDDService {
-                bin_path: format!("{}/cdd-rust", bin_path),
+                bin_path: format!("{}/cdd-kotlin", bin_path),
                 template_path: "~/.cdd/templates/kotlin".to_string(),
                 project_path: "./kotlin".to_string(),
                 component_file: "API/Models.kt".to_string(),
@@ -91,7 +91,7 @@ impl Default for Config {
         services.insert(
             "ios".to_string(),
             CDDService {
-                bin_path: format!("{}/cdd-rust", bin_path),
+                bin_path: format!("{}/cdd-swift", bin_path),
                 template_path: "~/.cdd/templates/iOS".to_string(),
                 project_path: "./iOS".to_string(),
                 component_file: "cddTemplate/Source/API/APIModels.swift".to_string(),
