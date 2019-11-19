@@ -47,12 +47,7 @@ impl Config {
 impl Default for Config {
     fn default() -> Self {
         let mut services = HashMap::new();
-
-        #[cfg(target_os = "macos")]
-        let bin_path = "~/.cdd/bin/darwin";
-
-        #[cfg(target_os = "linux")]
-        let bin_path = "~/.cdd/bin/linux";
+        let bin_path = "~/.cdd/bin";
 
         services.insert(
             "rust".to_string(),
@@ -68,7 +63,7 @@ impl Default for Config {
         services.insert(
             "typescript".to_string(),
             CDDService {
-                bin_path: format!("{}/cdd-rust", bin_path),
+                bin_path: format!("{}/cdd-typescript", bin_path),
                 template_path: "~/.cdd/templates/typescript".to_string(),
                 project_path: "./typescript".to_string(),
                 component_file: "API/Models.ts".to_string(),
