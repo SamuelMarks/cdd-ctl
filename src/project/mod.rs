@@ -40,6 +40,8 @@ impl Project {
 
                 vars.push(Box::new(variable));
             }
+        } else {
+            println!("THING: {:?}", schema);
         }
         Model { name, vars }
     }
