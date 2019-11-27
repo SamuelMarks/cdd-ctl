@@ -24,26 +24,152 @@ pub struct Info {
     pub endpoint: String,
 }
 
-impl Project {
-    pub fn parse_model(name: String, schema: openapiv3::Schema) -> Model {
-        let mut vars: Vec<Box<Variable>> = vec![];
-        if let openapiv3::SchemaKind::Any(any_schema) = schema.schema_kind {
-            for (name, reference) in any_schema.properties {
-                let optional = any_schema.required.contains(&name);
-                let variable_type = Project::parse_type(reference.unbox());
-                let variable = Variable {
-                    name,
-                    variable_type,
-                    optional: !optional,
-                    value: None,
-                };
 
-                vars.push(Box::new(variable));
+
+use crate::error::*;
+
+fn extract_variable_from_openapi(class_name: &str, var_name: &str, schema: openapiv3::Schema) -> CliResult<Variable> {
+    if let openapiv3::SchemaKind::Type(schema_type) = schema.schema_kind {
+        let variable_type = match schema_type {
+            Type::String(_) => VariableType::StringType,
+            Type::Number(_) => VariableType::FloatType,
+            Type::Integer(_) => VariableType::IntType,
+            // Type::Object(_) => {
+            //     VariableType::ComplexType("Need to implement".to_string())
+            // } //Need to implement
+            Type::Array(val) => {
+                let item_type = Project::parse_type(val.items.clone().unbox());
+                VariableType::ArrayType(Box::new(item_type))
+            }
+            Type::Boolean {} => VariableType::BoolType,
+            _ => {
+            return Err(failure::format_err!(
+                "Unsupported variable type on {} for {}: {:?}", class_name, var_name, schema_type));
+            }
+        };
+
+        Ok(Variable {
+            name: var_name.to_string(),
+            optional: false,
+            value: None,
+            variable_type: variable_type
+        })
+    } else {
+        Err(failure::format_err!(
+            "Unsupported variable type on {} for {}", class_name, var_name))
+    }
+}
+
+impl Project {
+    pub fn parse_model(name: String, schema: openapiv3::Schema) -> CliResult<Model> {
+        
+
+        if let openapiv3::SchemaKind::Type(schema_type) = schema.schema_kind {
+            // we only support single-type return types right now. (no multiple schema)
+
+            if let Type::Object(o) = schema_type {
+                // should be an object (will support raw return types later)
+
+                let mut vars: Vec<Box<Variable>> = vec![];
+                for (var_name, props) in o.properties {
+
+                    if let ReferenceOr::Item(schema) = props {
+                        vars.push(Box::new(extract_variable_from_openapi(&name, &var_name, *schema)?));
+                    } else {
+                        return Err(failure::format_err!(
+                            "Reference types for variables are not supported in {} for {}", name, var_name))
+                    }
+
+                    // cycle through member variables
+                    // println!("VAR FOUND: {:#?}", props);
+
+                    // if let ReferenceOr::Item(schema) = props {
+                    //     // okay, the variable wasn't a reference, lets find out what it was.
+
+                    //     let var_type = if let openapiv3::SchemaKind::Type(schema_type) = schema.schema_kind {
+                    //         match schema_type {
+                    //             Type::String(_) => VariableType::StringType,
+                    //             Type::Number(_) => VariableType::FloatType,
+                    //             Type::Integer(_) => VariableType::IntType,
+                    //             // Type::Object(_) => {
+                    //             //     VariableType::ComplexType("Need to implement".to_string())
+                    //             // } //Need to implement
+                    //             Type::Array(val) => {
+                    //                 let item_type = Project::parse_type(val.items.clone().unbox());
+                    //                 VariableType::ArrayType(Box::new(item_type))
+                    //             }
+                    //             Type::Boolean {} => VariableType::BoolType,
+                    //             _ => {
+                    //             return Err(failure::format_err!(
+                    //                 "Unsupported variable type on {} for {}: {:?}", name, var_name, schema_type));
+                    //             }
+                    //         };
+                    //     } else {
+                    //         return Err(failure::format_err!(
+                    //             "Unsupported variable type on {} for {}", name, var_name));
+                    //     };
+                    //     // vars.push(Box::new(VariableType::StringType));
+                    //     println!("VAR FOUND: {:?}", var_type);
+
+                    // } else {
+                    //     return Err(failure::format_err!(
+                    //         "Reference types for variables are not supported in {} for {}", name, var_name));
+                    // }
+
+                }
+
+                
+
+                println!("model found: {:#?}", (name.clone(), vars.clone()));
+
+                return Ok(Model { name, vars });
+            } else {
+                log::error!("Only concrete object types are supported as return types. model was: {}, schema_type was: {:?}", name, schema_type)
             }
         } else {
-            println!("THING: {:?}", schema);
+               log::error!("multiple inheritance schemas not supported! Please remove the use of OneOf, AllOf, etc. model was: {}, schema_kind was: {:?}", name, schema.schema_kind)
         }
-        Model { name, vars }
+
+        panic!("error supporting models in openapi.yml");
+
+
+
+
+        // let schema_refs = match schema.schema_kind {
+        //     openapiv3::SchemaKind::OneOf{ one_of } => one_of,
+        //     openapiv3::SchemaKind::AllOf{ all_of } => all_of,
+        //     openapiv3::SchemaKind::AnyOf{ any_of } => any_of,
+        //     openapiv3::SchemaKind::Any(any) => any.properties,
+        // };
+
+        // if let openapiv3::SchemaKind::Any(any_schema) = schema.schema_kind {
+        //     for (name, reference) in any_schema.properties {
+        //         let optional = any_schema.required.contains(&name);
+        //         let variable_type = Project::parse_type(reference.unbox());
+        //         let variable = Variable {
+        //             name,
+        //             variable_type,
+        //             optional: !optional,
+        //             value: None,
+        //         };
+
+        //         vars.push(Box::new(variable));
+        //     }
+        // } else {
+        //     if let openapiv3::SchemaKind::Type(schema_type) = schema.schema_kind {
+        //         // let variable = ;
+
+        //         // println!("TYPE: {:#?}", schema_type.properties);
+
+        //         type_to_variable(schema_type);
+
+                
+
+        //     } else {
+        //        log::error!("multiple inheritance schemas not supported! Please remove the use of OneOf, AllOf, etc. model was: {}, schema_kind was: {:?}", name, schema.schema_kind)
+        //     }
+        // }
+        // Model { name, vars }
     }
 
     fn parse_parameter_data(data: ParameterData) -> Variable {
@@ -123,7 +249,7 @@ impl Project {
         }
     }
 
-    pub fn parse_yml(open_api: OpenAPI) -> Self {
+    pub fn parse_yml(open_api: OpenAPI) -> CliResult<Self> {
         // println!("{}", open_api.info.title);
         //Parse INFO
         let mut project = Project {
@@ -167,7 +293,7 @@ impl Project {
                     };
                 }
                 if !is_array_type {
-                    let model = Project::parse_model(name, schema);
+                    let model = Project::parse_model(name, schema)?;
                     project.models.push(model);
                 }
             }
@@ -250,7 +376,7 @@ impl Project {
 
         // println!("{:?}", project);
 
-        project
+        Ok(project)
     }
 }
 

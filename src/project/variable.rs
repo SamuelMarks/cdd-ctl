@@ -9,7 +9,7 @@ pub struct Variable {
     pub value: Option<String>,
 }
 
-#[derive(Debug, PartialEq, Clone, Deserialize)]
+#[derive(Debug, PartialEq, Clone, Deserialize, Serialize)]
 pub enum VariableType {
     #[serde(rename = "String")]
     StringType,
@@ -23,42 +23,6 @@ pub enum VariableType {
     ArrayType(Box<VariableType>),
     #[serde(rename = "Complex")]
     ComplexType(String),
-}
-
-impl std::fmt::Display for VariableType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "yes")
-    }
-}
-
-impl serde::Serialize for VariableType {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where S: serde::Serializer
-    {
-        let s = match &self {
-            VariableType::StringType => "String",
-            VariableType::IntType => "Int",
-            VariableType::BoolType => "Bool",
-            VariableType::FloatType => "Float",
-            VariableType::ArrayType(ref vartype) => {
-                // recursive enums are the devil, we should be using reference counting here
-                unsafe {
-                    match *Box::into_raw(vartype.clone()) {
-                        VariableType::StringType => "[String]",
-                        VariableType::IntType => "[Int]",
-                        VariableType::BoolType => "[Bool]",
-                        VariableType::FloatType => "[Float]",
-                        _ => "[Complex]",
-                    }
-                }
-            },
-            VariableType::ComplexType(ref vartype) => {
-                &(*vartype)
-            },
-        };
-        
-        serializer.serialize_str(&s)
-    }
 }
 
 impl VariableType {

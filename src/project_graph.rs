@@ -27,7 +27,7 @@ impl ProjectGraph {
     /// super basic one way spec -> projects sync
     pub fn simple_sync(&self) -> CliResult<()> {
         // let spec_graph = Project::from(self.spec.clone());
-        let spec_graph = Project::parse_yml(self.spec.clone());
+        let spec_graph = Project::parse_yml(self.spec.clone())?;
 
         info!(
             "Found {} models, {} routes in {}",

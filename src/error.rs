@@ -13,6 +13,9 @@ pub enum CliError {
     #[fail(display = "reading config: {}", msg)]
     InvalidConfig { msg: String },
 
+    #[fail(display = "unsupported feature in openapi spec: {}", msg)]
+    UnsupportedOpenApiFeature { msg: String },
+
     #[fail(display = "IO error: {}", error)]
     IoError { error: std::io::Error },
 
