@@ -10,11 +10,11 @@ pub fn exec(cmd: &str, args: Vec<&str>) -> CliResult<String> {
     let stderr = String::from_utf8(output.stderr)?;
 
     for line in stdout.lines() {
-        info!("{}", line);
+        info!("[{}] {}", cmd, line);
     }
 
     for line in stderr.lines() {
-        error!("{}", line);
+        error!("[{}] {}", cmd, line);
     }
 
     match output.status.success() {

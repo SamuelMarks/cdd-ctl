@@ -1,15 +1,13 @@
-use openapiv3::{OpenAPI, ReferenceOr};
-
-mod model;
-pub use model::*;
-mod variable;
-pub use variable::*;
-mod request;
-use crate::project::request::Method::*;
 use openapiv3::*;
-pub use request::*;
 use std::collections::HashMap;
 use url::Url;
+
+pub mod model;
+pub use model::*;
+pub mod variable;
+pub use variable::*;
+pub mod request;
+pub use request::*;
 
 #[derive(Debug)]
 pub struct Project {
@@ -383,18 +381,19 @@ impl Project {
 trait Additional {
     fn path_to_request(&self) -> Vec<(Operation, Method)>;
 }
+
 impl Additional for PathItem {
     fn path_to_request(&self) -> Vec<(Operation, Method)> {
         let mm = self.clone();
         let arr: Vec<(Option<Operation>, Method)> = vec![
-            (mm.get, Get_),
-            (mm.post, Post_),
-            (mm.put, Put_),
-            (mm.delete, Delete_),
-            (mm.options, Options_),
-            (mm.head, Head_),
-            (mm.patch, Patch_),
-            (mm.trace, Trace_),
+            (mm.get, Method::Get_),
+            (mm.post, Method::Post_),
+            (mm.put, Method::Put_),
+            (mm.delete, Method::Delete_),
+            (mm.options, Method::Options_),
+            (mm.head, Method::Head_),
+            (mm.patch, Method::Patch_),
+            (mm.trace, Method::Trace_),
         ];
 
         arr.into_iter()

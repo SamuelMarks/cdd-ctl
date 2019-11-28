@@ -12,4 +12,4 @@ mod util;
 pub use self::args::run;
 pub use self::error::CliError;
 pub(crate) use self::error::CliResult;
-pub use project::{Method, Model, Project, Request, Variable, VariableType};
+pub use project::{Method, Model, Project, Request, Variable, VariableType, request::Method::*};
