@@ -26,7 +26,7 @@ pub struct Info {
 
 use crate::error::*;
 
-fn extract_variable_from_openapi(class_name: &str, var_name: &str, schema: openapiv3::Schema) -> CliResult<Variable> {
+fn extract_variable_from_openapi(class_name: &str, var_name: &str, schema: openapiv3::Schema, optional: bool) -> CliResult<Variable> {
     if let openapiv3::SchemaKind::Type(schema_type) = schema.schema_kind {
         let variable_type = match schema_type {
             Type::String(_) => VariableType::StringType,
@@ -48,7 +48,7 @@ fn extract_variable_from_openapi(class_name: &str, var_name: &str, schema: opena
 
         Ok(Variable {
             name: var_name.to_string(),
-            optional: false,
+            optional,
             value: None,
             variable_type: variable_type
         })
@@ -69,10 +69,13 @@ impl Project {
                 // should be an object (will support raw return types later)
 
                 let mut vars: Vec<Box<Variable>> = vec![];
+                let required_vars: Vec<String> = o.required;
+
                 for (var_name, props) in o.properties {
 
                     if let ReferenceOr::Item(schema) = props {
-                        vars.push(Box::new(extract_variable_from_openapi(&name, &var_name, *schema)?));
+                        let optional = !required_vars.contains(&var_name);
+                        vars.push(Box::new(extract_variable_from_openapi(&name, &var_name, *schema, optional)?));
                     } else {
                         return Err(failure::format_err!(
                             "Reference types for variables are not supported in {} for {}", name, var_name))
