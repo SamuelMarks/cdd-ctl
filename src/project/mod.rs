@@ -359,10 +359,11 @@ impl Project {
                         .replace("/", "")
                         .replace("{", "")
                         .replace("}", "");
+
                     let request = Request {
                         name,
                         vars,
-                        path: url_path.to_string(),
+                        path: split_url_path(&url_path),
                         method,
                         response_type,
                         error_type,
@@ -415,4 +416,10 @@ impl CustomIterators for Vec<Request> {
     fn all_names(&self) -> Vec<String> {
         self.iter().map(|request| request.name.clone()).collect()
     }
+}
+
+fn split_url_path(url: &str) -> String {
+    let mut url = url.split("/").collect::<Vec<_>>();
+    url.remove(url.len() - 1);
+    url.join("/")
 }
