@@ -11,7 +11,7 @@ Compiler Driven Development (CDD) command-line interface.
 Currently we support macos and linux. As xcode is not available on linux however, the linux adaptor has no current support.
 
 ```bash
-curl --proto '=https' --tlsv1.2 -sSf https://github.com/offscale/cdd-ctl/install.sh | sh
+curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/offscale/cdd-ctl/master/install.sh | sh
 ```
 
 ## Developer guide
