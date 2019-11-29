@@ -14,6 +14,13 @@ Currently we support macos and linux. As xcode is not available on linux however
 curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/offscale/cdd-ctl/master/install.sh | sh
 ```
 
+## Usage
+
+### Quick tips
+
+- don't create primary keys in your `openapi.yml` yet, primary keys are automatically created for every resource type. custom keys will be supported soon.
+- the tool will automatically create a database schema based on your openapi and dump it to database.sql. use this then cd into your server and use the Makefile in there to import your database into the rust server schema.
+
 ## Developer guide
 
 Install the latest stable version of [Rust](https://www.rust-lang.org). [CLI tool for installing Rust](https://rustup.rs).
