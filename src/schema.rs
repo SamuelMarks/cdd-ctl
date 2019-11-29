@@ -37,5 +37,12 @@ fn vars_to_sql(vars: Vec<Box<Variable>>) -> String {
 }
 
 fn var_to_sql(var: Variable) -> String {
-    format!("\t{} {}", var.name, var.variable_type.to_mysql())
+    println!("--> {:?}", var);
+    let not_null = if var.optional {
+        ""
+    } else {
+        " NOT NULL"
+    };
+
+    format!("\t{} {}{}", var.name, var.variable_type.to_mysql(), not_null)
 }

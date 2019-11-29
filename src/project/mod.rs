@@ -75,7 +75,10 @@ impl Project {
 
                     if let ReferenceOr::Item(schema) = props {
                         let optional = !required_vars.contains(&var_name);
-                        vars.push(Box::new(extract_variable_from_openapi(&name, &var_name, *schema, optional)?));
+                        let variable = extract_variable_from_openapi(&name, &var_name, *schema, optional)?;
+
+                        // println!("VARRRRRRRRR: {:?}", variable);
+                        vars.push(Box::new(variable));
                     } else {
                         return Err(failure::format_err!(
                             "Reference types for variables are not supported in {} for {}", name, var_name))
