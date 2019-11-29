@@ -27,7 +27,7 @@ fn vars_to_sql(vars: Vec<Box<Variable>>) -> String {
     }
 
     format!(
-        "(\n\tid INT PRIMARY KEY,\n{}\n)", // this is a hack for primary key support - need to support x-keys
+        "(\n\tid INT PRIMARY KEY NOT NULL,\n{}\n)", // this is a hack for primary key support - need to support x-keys
         vars.into_iter()
             .map(|m| *m)
             .map(var_to_sql)
