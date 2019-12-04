@@ -3,21 +3,21 @@ use config::*;
 use log::*;
 use std::path::PathBuf;
 
-pub fn init(_name: String) -> CliResult<()> {
-    let _ = init_config_file()?;
+pub fn init(name: &str) -> CliResult<()> {
+    let _ = init_config_file(name)?;
     let _ = copy_openapi_spec()?;
 
     Ok(())
 }
 
-fn init_config_file() -> CliResult<()> {
+fn init_config_file(name: &str) -> CliResult<()> {
     let config_path = PathBuf::from("./config.yml");
 
     if config_path.exists() {
         return Err(failure::format_err!("config.yml already exists."));
     };
 
-    let config = Config::default();
+    let config = Config::new(name);
     config.write(config_path)?;
     info!("Wrote default config file to ./config.yml");
 

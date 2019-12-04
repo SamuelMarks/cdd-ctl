@@ -44,10 +44,8 @@ impl Config {
 
         Ok(())
     }
-}
 
-impl Default for Config {
-    fn default() -> Self {
+    pub fn new(name: &str) -> Self {
         let mut services = HashMap::new();
         let bin_path = "~/.cdd/bin";
 
@@ -96,7 +94,7 @@ impl Default for Config {
             },
         );
         Config {
-            name: "default project".to_string(),
+            name: name.to_string(),
             version: "0.0.1".to_string(),
             description: "description".to_string(),
             author: "me@me.com".to_string(),

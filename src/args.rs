@@ -41,7 +41,7 @@ pub fn run() -> CliResult<()> {
     let _ = logger::start_logger(opt.verbose, false);
 
     match opt.cmd {
-        Command::Init { name } => crate::commands::init(name),
+        Command::Init { name } => crate::commands::init(&name),
         Command::Sync => crate::commands::sync(),
     }
 }
