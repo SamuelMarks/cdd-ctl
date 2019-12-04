@@ -12,12 +12,6 @@ enum Command {
         #[structopt(help = "", name = "name")]
         name: String,
     },
-
-    // #[structopt(
-    //     name = "regenerate",
-    //     about = "Regenerates templates (warning: overwrites existing templates)"
-    // )]
-    // Regenerate,
     #[structopt(
         name = "sync",
         about = "Syncs CDD projects using language-specific adaptors"
@@ -44,15 +38,10 @@ struct Opt {
 
 pub fn run() -> CliResult<()> {
     let opt = Opt::from_args();
-
     let _ = logger::start_logger(opt.verbose, false);
-
-    // // let _config = Config::read(opt.config)?;
-    // log::info!("Successfully read configuration file.");
 
     match opt.cmd {
         Command::Init { name } => crate::commands::init(name),
-        // Command::Regenerate => crate::commands::regenerate(),
         Command::Sync => crate::commands::sync(),
     }
 }

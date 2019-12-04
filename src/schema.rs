@@ -1,9 +1,7 @@
 use crate::*;
 use log::*;
 
-// java -jar openapi-generator-cli.jar generate -i ~/Workspaces/cdd.workspace/testbed/openapi.yml  --generator-name mysql-schema
-
-pub fn generate(path: &str, project: Project) -> String {
+pub fn generate(project: Project) -> String {
     info!("Generating sql migration schema");
     project
         .models
@@ -27,7 +25,7 @@ fn vars_to_sql(vars: Vec<Box<Variable>>) -> String {
     }
 
     format!(
-        "(\n\tid INT PRIMARY KEY NOT NULL,\n{}\n)", // this is a hack for primary key support - need to support x-keys
+        "(\n{}\n)", // this is a hack for primary key support - need to support x-keys
         vars.into_iter()
             .map(|m| *m)
             .map(var_to_sql)
@@ -44,5 +42,11 @@ fn var_to_sql(var: Variable) -> String {
         " NOT NULL"
     };
 
-    format!("\t{} {}{}", var.name, var.variable_type.to_mysql(), not_null)
+    let is_pk = if var.name == "id".to_string() {
+        " PRIMARY KEY AUTOINCREMENT"
+    } else {
+        ""
+    };
+
+    format!("\t{} {}{}{}", var.name, var.variable_type.to_mysql(), is_pk, not_null)
 }

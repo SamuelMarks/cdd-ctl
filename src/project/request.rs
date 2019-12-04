@@ -40,14 +40,14 @@ impl Method {
 impl std::fmt::Display for Method {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Get_ => write!(f, "GET"),
-            Post_ => write!(f, "POST"),
-            Put_ => write!(f, "PUT"),
-            Delete_ => write!(f, "DELETE"),
-            Options_ => write!(f, "OPTIONS"),
-            Head_ => write!(f, "HEAD"),
-            Patch_ => write!(f, "PATCH"),
-            Trace_ => write!(f, "TRACE"),
+            Method::Get_ => write!(f, "GET"),
+            Method::Post_ => write!(f, "POST"),
+            Method::Put_ => write!(f, "PUT"),
+            Method::Delete_ => write!(f, "DELETE"),
+            Method::Options_ => write!(f, "OPTIONS"),
+            Method::Head_ => write!(f, "HEAD"),
+            Method::Patch_ => write!(f, "PATCH"),
+            Method::Trace_ => write!(f, "TRACE"),
         }
     }
 }

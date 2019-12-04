@@ -27,7 +27,9 @@ pub(crate) struct Config {
 impl Config {
     /// Read a configuration file from an optional location, or try several default locations.
     pub fn read(file: PathBuf) -> CliResult<Self> {
-        let file_contents: String = util::read_file(file)?;
+        let file_contents: String = util::read_file(file).or(Err(failure::format_err!(
+            "Could not find a config.yml. Try running the init command first if this is a new project."
+        )))?;
         Ok(serde_yaml::from_str(&file_contents)?)
     }
 

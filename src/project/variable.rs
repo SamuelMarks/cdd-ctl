@@ -29,9 +29,9 @@ impl VariableType {
     pub fn to_mysql(&self) -> String {
         match self {
             VariableType::StringType => "TEXT",
-            VariableType::IntType => "INT",
+            VariableType::IntType => "INTEGER",
             VariableType::BoolType => "TINYINT",
-            VariableType::FloatType => "INT",
+            VariableType::FloatType => "REAL",
             _ => "TEXT",
         }
         .to_string()

@@ -2,26 +2,27 @@ use crate::*;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-pub fn file_search(filename: &str, pwd: bool, home: bool) -> Option<String> {
-    let mut paths: Vec<PathBuf> = vec![];
+// (use later in more extensive design patterns)
+// pub fn file_search(filename: &str, pwd: bool, home: bool) -> Option<String> {
+//     let mut paths: Vec<PathBuf> = vec![];
 
-    if pwd {
-        paths.push(PathBuf::from(format!("./{}", filename)));
-    }
-    if home {
-        if let Ok(home_dir) = home_dir() {
-            paths.push(home_dir);
-        }
-    }
+//     if pwd {
+//         paths.push(PathBuf::from(format!("./{}", filename)));
+//     }
+//     if home {
+//         if let Ok(home_dir) = home_dir() {
+//             paths.push(home_dir);
+//         }
+//     }
 
-    for path in paths {
-        if let Ok(file) = read_file(path) {
-            return Some(file);
-        }
-    }
+//     for path in paths {
+//         if let Ok(file) = read_file(path) {
+//             return Some(file);
+//         }
+//     }
 
-    None
-}
+//     None
+// }
 
 pub fn file_exists<S: std::convert::AsRef<std::ffi::OsStr>>(filename: S) -> bool {
     Path::new(&filename).exists()
@@ -53,10 +54,6 @@ pub fn copy_dir<F: AsRef<Path>, T: AsRef<Path>>(from: F, to: T) -> CliResult<()>
     Ok(copy(from, to, &options).map(|_| ())?)
 }
 
-// pub fn copy_files_recursively(pathbuf: PathBuf) -> CliResult<()> {
-//     Ok(())
-// }
-
 pub fn home_dir() -> CliResult<PathBuf> {
     Ok(dirs::home_dir()
         .ok_or_else(|| failure::format_err!("There was a problem locating your home directory."))?)
@@ -70,9 +67,9 @@ pub fn expand_home_path(path: String) -> CliResult<String> {
     Ok(path.replace("~", &home_dir))
 }
 
-#[test]
-fn test_find_file() {
-    assert_eq!(file_search("fakefile", true, false), None);
-    assert_eq!(file_search("Cargo.toml", true, false).is_some(), true);
-    assert_eq!(file_search("Cargo.toml", false, false), None);
-}
+// #[test]
+// fn test_find_file() {
+//     assert_eq!(file_search("fakefile", true, false), None);
+//     assert_eq!(file_search("Cargo.toml", true, false).is_some(), true);
+//     assert_eq!(file_search("Cargo.toml", false, false), None);
+// }
