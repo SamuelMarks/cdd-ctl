@@ -1,4 +1,4 @@
-/target
+target
 **/*.rs.bk
 
 # Developer directory for bash automation

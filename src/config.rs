@@ -21,7 +21,14 @@ pub(crate) struct Config {
     author: String,
     openapi: String,
     auth: String,
+    pub(crate) rpc_services: Vec<RPCService>,
     pub(crate) services: HashMap<String, CDDService>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub(crate) struct RPCService {
+    server: String,
+    exec: String,
 }
 
 impl Config {
@@ -100,6 +107,10 @@ impl Config {
             author: "me@me.com".to_string(),
             openapi: "openapi.yaml".to_string(),
             auth: "rfc6749".to_string(),
+            rpc_services: vec![RPCService {
+                server: String::from("localhost:4444"),
+                exec: format!("{}/cdd-rust --port 4444", bin_path)
+            }],
             services,
         }
     }

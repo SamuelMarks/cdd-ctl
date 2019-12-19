@@ -14,9 +14,13 @@ pub(crate) struct CDDService {
 }
 
 impl CDDService {
+    /// request the adaptor creates new project files
+    pub fn create_template(&self) -> CliResult<()> {
+        self.exec(vec!["create-template", &self.project_path]).map(|_|())
+    }
+
     pub fn sync_with(&self, spec_project: &Project) -> CliResult<()> {
         let project = self.extract_project()?;
-
         let project_model_names = project.models.all_names();
         let spec_model_names = spec_project.models.all_names();
         let project_request_names = project.requests.all_names();

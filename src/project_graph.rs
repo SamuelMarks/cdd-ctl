@@ -44,7 +44,6 @@ impl ProjectGraph {
     }
 
     pub fn copy_templates(&self) -> CliResult<()> {
-        info!("Checking project directories");
         for (name, service) in self.config.services.clone() {
             let project_path = service.project_path.clone();
             if !util::file_exists(project_path.clone()) {
@@ -54,6 +53,8 @@ impl ProjectGraph {
                     project_path,
                     service.template_path,
                 );
+
+                // service.create_template()?;
 
                 let template_path = util::expand_home_path(service.template_path.clone())?;
                 util::copy_dir(template_path, ".")?;
