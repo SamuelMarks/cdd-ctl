@@ -109,7 +109,7 @@ impl Config {
             auth: "rfc6749".to_string(),
             rpc_services: vec![RPCService {
                 server: String::from("localhost:4444"),
-                exec: format!("{}/cdd-rust --port 4444", bin_path)
+                exec: format!("{}/cdd-rust --port 4444", bin_path),
             }],
             services,
         }
