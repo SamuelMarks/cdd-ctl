@@ -11,7 +11,7 @@ Example request:
 
 Example response:
 ```json
-{"jsonrpc" : "2.0", "result" : [{name: "Pet", age: 45}]
+{"jsonrpc" : "2.0", "result" : [{ "name" : "Pet", "age" : 45 }]
 ```
 
 ## Authentication
