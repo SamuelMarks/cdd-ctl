@@ -21,14 +21,7 @@ pub(crate) struct Config {
     author: String,
     openapi: String,
     auth: String,
-    pub(crate) rpc_services: Vec<RPCService>,
     pub(crate) services: HashMap<String, CDDService>,
-}
-
-#[derive(Serialize, Deserialize)]
-pub(crate) struct RPCService {
-    server: String,
-    exec: String,
 }
 
 impl Config {
@@ -60,6 +53,7 @@ impl Config {
             "rust".to_string(),
             CDDService {
                 bin_path: format!("{}/cdd-rust", bin_path),
+                address: String::from("localhost:4444"),
                 template_path: "~/.cdd/templates/rust".to_string(),
                 project_path: "./rust".to_string(),
                 component_file: "src/models.rs".to_string(),
@@ -71,6 +65,7 @@ impl Config {
             "typescript".to_string(),
             CDDService {
                 bin_path: format!("{}/cdd-typescript", bin_path),
+                address: String::from("localhost:4444"),
                 template_path: "~/.cdd/templates/typescript".to_string(),
                 project_path: "./typescript".to_string(),
                 component_file: "API/Models.ts".to_string(),
@@ -82,6 +77,7 @@ impl Config {
             "kotlin".to_string(),
             CDDService {
                 bin_path: format!("{}/cdd-kotlin", bin_path),
+                address: String::from("localhost:4444"),
                 template_path: "~/.cdd/templates/kotlin".to_string(),
                 project_path: "./kotlin".to_string(),
                 component_file: "API/Models.kt".to_string(),
@@ -94,6 +90,7 @@ impl Config {
             "ios".to_string(),
             CDDService {
                 bin_path: format!("{}/cdd-swift", bin_path),
+                address: String::from("localhost:4444"),
                 template_path: "~/.cdd/templates/iOS".to_string(),
                 project_path: "./iOS".to_string(),
                 component_file: "cddTemplate/Source/API/APIModels.swift".to_string(),
@@ -107,10 +104,13 @@ impl Config {
             author: "me@me.com".to_string(),
             openapi: "openapi.yaml".to_string(),
             auth: "rfc6749".to_string(),
+<<<<<<< HEAD
             rpc_services: vec![RPCService {
                 server: String::from("localhost:4444"),
                 exec: format!("{}/cdd-rust-rpc --port 4444", bin_path)
             }],
+=======
+>>>>>>> b18d64fb58f93b63b796c172732e2e3ef08d6848
             services,
         }
     }

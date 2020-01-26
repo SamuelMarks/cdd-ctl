@@ -7,6 +7,7 @@ use serde_json;
 #[derive(Serialize, Deserialize, Clone)]
 pub(crate) struct CDDService {
     pub bin_path: String,
+    pub address: String,
     pub template_path: String,
     pub project_path: String,
     pub component_file: String,
@@ -16,7 +17,8 @@ pub(crate) struct CDDService {
 impl CDDService {
     /// request the adaptor creates new project files
     pub fn create_template(&self) -> CliResult<()> {
-        self.exec(vec!["create-template", &self.project_path]).map(|_|())
+        self.exec(vec!["create-template", &self.project_path])
+            .map(|_| ())
     }
 
     pub fn sync_with(&self, spec_project: &Project) -> CliResult<()> {
@@ -176,30 +178,6 @@ impl CDDService {
         warn!("Deleting request {}", name);
         self.exec(vec!["delete-request", &self.request_files(), name])
     }
-
-    // pub fn model_names(&self) -> CliResult<Vec<String>> {
-    //     Ok(self
-    //         .extract_models()?
-    //         .into_iter()
-    //         .map(|model| model.name)
-    //         .collect())
-    // }
-
-    // pub fn request_names(&self) -> CliResult<Vec<String>> {
-    //     Ok(self
-    //         .extract_requests()?
-    //         .into_iter()
-    //         .map(|request| request.name)
-    //         .collect())
-    // }
-
-    // pub fn contains_model(&self, model_name: &str) -> CliResult<bool> {
-    //     Ok(self.model_names()?.contains(&model_name.to_string()))
-    // }
-
-    // pub fn contains_request(&self, request_name: &str) -> CliResult<bool> {
-    //     Ok(self.request_names()?.contains(&request_name.to_string()))
-    // }
 
     fn exec(&self, args: Vec<&str>) -> CliResult<String> {
         let bin_path = util::expand_home_path(self.bin_path.clone())?;
