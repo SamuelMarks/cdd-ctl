@@ -1,3 +1,5 @@
+note: this repository will be retired soon, in favor of further modularisation. Please see cdd-core and cdd-ctl instead.
+
 # cdd-ctl
 
 [![Rust: nightly](https://img.shields.io/badge/Rust-nightly-blue.svg)](https://www.rust-lang.org)

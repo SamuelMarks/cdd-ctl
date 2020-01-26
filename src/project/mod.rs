@@ -9,14 +9,14 @@ pub use variable::*;
 pub mod request;
 pub use request::*;
 
-#[derive(Debug)]
+#[derive(serde::Serialize, serde::Deserialize, Debug)]
 pub struct Project {
     pub info: Info,
     pub models: Vec<Model>,
     pub requests: Vec<Request>,
 }
 
-#[derive(Debug)]
+#[derive(serde::Serialize, serde::Deserialize, Debug)]
 pub struct Info {
     pub host: String,
     pub endpoint: String,
@@ -55,6 +55,7 @@ fn extract_variable_from_openapi(class_name: &str, var_name: &str, schema: opena
 
 impl Project {
     pub fn parse_model(name: String, schema: openapiv3::Schema) -> CliResult<Model> {
+
         if let openapiv3::SchemaKind::Type(schema_type) = schema.schema_kind {
             // we only support single-type return types right now. (no multiple schema)
             if let Type::Object(o) = schema_type {
@@ -82,13 +83,14 @@ impl Project {
 
                 return Ok(Model { name, vars });
             } else {
-                log::error!("Only concrete object types are supported as return types. model was: {}, schema_type was: {:?}", name, schema_type)
+                return Err(failure::format_err!("Only concrete object types are supported as return types. model was: {}, schema_type was: {:?}", name, schema_type));
             }
-        } else {
-               log::error!("multiple inheritance schemas not supported! Please remove the use of OneOf, AllOf, etc. model was: {}, schema_kind was: {:?}", name, schema.schema_kind)
         }
 
-        panic!("error supporting models in openapi.yml");
+        // class is a child in an inheritance pattern, don't append variables.
+        Ok(Model {
+            name, vars: vec![]
+        })
     }
 
     fn parse_parameter_data(data: ParameterData) -> Variable {
