@@ -72,7 +72,7 @@ async fn main() -> std::io::Result<()> {
         for tool in native_tools {
             app_config.servers.insert(
                 tool.to_string(),
-                cdd_ctl::ProcessConfig {
+                cdd_engine::daemon::ProcessConfig {
                     command: Some(tool.to_string()),
                     args: Some(vec!["serve_json_rpc".to_string()]),
                     external_address: None,

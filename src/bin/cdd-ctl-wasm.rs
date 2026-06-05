@@ -271,7 +271,7 @@ async fn main() -> std::io::Result<()> {
         for tool in wasm_tools {
             app_config.servers.insert(
                 tool.to_string(),
-                cdd_ctl::ProcessConfig {
+                cdd_engine::daemon::ProcessConfig {
                     command: Some("wasmtime".to_string()),
                     args: Some(vec![
                         format!("cdd-ctl-wasm-sdk/assets/wasm/{}.wasm", tool),
