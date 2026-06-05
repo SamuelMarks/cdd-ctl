@@ -2,7 +2,7 @@
 FROM rust:alpine AS builder
 
 # Install build dependencies
-RUN apk add --no-cache musl-dev gcc pkgconfig openssl-dev postgresql-dev
+RUN apk add --no-cache musl-dev gcc pkgconfig openssl-dev postgresql-dev curl
 
 # Create a new empty shell project
 WORKDIR /usr/src/cdd-ctl

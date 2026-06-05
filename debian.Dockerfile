@@ -2,7 +2,7 @@
 FROM rust:slim-bookworm AS builder
 
 # Install build dependencies
-RUN apt-get update && apt-get install -y pkg-config libssl-dev gcc build-essential libpq-dev && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y pkg-config libssl-dev gcc build-essential libpq-dev curl && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /usr/src/cdd-ctl
 COPY . .
