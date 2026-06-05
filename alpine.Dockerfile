@@ -9,7 +9,7 @@ WORKDIR /usr/src/cdd-ctl
 COPY . .
 
 # Build for release
-RUN cargo build --release
+RUN RUSTFLAGS="-C target-feature=-crt-static" cargo build --release
 
 # Stage 2: Final
 FROM alpine:latest
