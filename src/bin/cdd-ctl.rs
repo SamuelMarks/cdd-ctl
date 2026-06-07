@@ -82,6 +82,13 @@ enum Commands {
         #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
         args: Vec<String>,
     },
+
+    /// Start Model Context Protocol (MCP) server over stdio.
+    #[command(name = "mcp")]
+    Mcp {
+        /// Optional target language to proxy directly to, otherwise acts as a unified orchestrator
+        target_language: Option<String>,
+    },
 }
 
 #[actix_web::main]
@@ -187,6 +194,28 @@ async fn main() -> std::io::Result<()> {
 
             std::io::Write::write_all(&mut std::io::stdout(), &output.stdout)?;
             return Ok(());
+        }
+        Some(Commands::Mcp { target_language }) => {
+            if let Some(lang) = target_language {
+                let executable = if lang.starts_with("cdd-") {
+                    lang
+                } else {
+                    format!("cdd-{}", lang)
+                };
+                let mut cmd = Command::new(&executable);
+                cmd.arg("mcp");
+
+                // We use `exec` style proxying if possible, but spawn works too
+                let mut child = cmd.spawn().unwrap_or_else(|e| {
+                    eprintln!("Failed to spawn {}: {}", executable, e);
+                    std::process::exit(1);
+                });
+                let status = child.wait()?;
+                std::process::exit(status.code().unwrap_or(1));
+            } else {
+                eprintln!("Unified MCP orchestrator not yet implemented. Use `cdd-ctl mcp <language>` for now.");
+                std::process::exit(1);
+            }
         }
         None => {}
     }
