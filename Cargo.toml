@@ -4,7 +4,7 @@ version = "0.0.1"
 edition = "2021"
 
 [dependencies]
-cdd-engine = { path = "../cdd-engine" }
+cdd-engine = { git = "https://github.com/SamuelMarks/cdd-engine" }
 cdd-gateway = { git = "https://github.com/SamuelMarks/cdd-gateway" }
 
 serde = { version = "1.0", features = ["derive"] }
