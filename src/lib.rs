@@ -6,7 +6,7 @@
 //! The main CLI orchestrator that delegates to `cdd-engine` and `cdd-gateway`.
 
 pub use cdd_engine::config::AppConfig;
-pub use cdd_engine::error::CddError;
+pub use cdd_engine::error::CddEngineError;
 
 pub use cdd_gateway::api;
 pub use cdd_gateway::db;

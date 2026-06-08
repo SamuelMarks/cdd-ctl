@@ -12,83 +12,54 @@ use clap::{Parser, Subcommand};
 use log::{error, info};
 use std::process::Command;
 use std::sync::Arc;
+use tokio::io::{stdin, stdout, AsyncBufReadExt, AsyncWriteExt, BufReader};
 
 use cdd_ctl::AppConfig;
 use cdd_ctl::{CddRepository, PgRepository};
 use cdd_ctl::{GitHubClient, ReqwestGitHubClient};
-use cdd_ctl::{ProcessConfig, ProcessManager};
+use cdd_engine::daemon::{ProcessConfig, ProcessManager};
+use cdd_engine::mcp::{McpOrchestrator, McpRequest, McpResponse};
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
-/// Command line arguments
 struct Args {
     #[command(subcommand)]
-    /// Optional subcommands
     command: Option<Commands>,
 
-    /// Path to configuration file (JSON/YAML/TOML)
     #[arg(short, long)]
-    /// Path to configuration file (JSON/YAML/TOML)
     config: Option<String>,
 
-    /// Override the bind address
     #[arg(short, long)]
-    /// Override the bind address
     bind: Option<String>,
 }
 
 #[derive(Subcommand, Debug)]
 enum Commands {
-    /// Generate JSON documentation with code snippets for an OpenAPI specification.
     #[command(name = "to_docs_json")]
     ToDocsJson {
-        /// Target language
         target_language: String,
-
-        /// Path or URL to the OpenAPI specification.
         #[arg(short, long)]
         input: String,
-
-        /// Omit the imports field.
         #[arg(long)]
         no_imports: bool,
-
-        /// Omit the wrapper fields.
         #[arg(long)]
         no_wrapping: bool,
     },
-
-    /// Generate code from an OpenAPI specification.
     #[command(name = "from_openapi")]
     FromOpenApi {
-        /// Target language
         target_language: String,
-
-        /// The generation target (e.g., to_sdk, to_server, to_orm)
         target: String,
-
-        /// Remaining arguments to pass to the target language CLI
         #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
         args: Vec<String>,
     },
-
-    /// Generate an OpenAPI specification from source code.
     #[command(name = "to_openapi")]
     ToOpenApi {
-        /// Target language
         target_language: String,
-
-        /// Remaining arguments to pass to the target language CLI
         #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
         args: Vec<String>,
     },
-
-    /// Start Model Context Protocol (MCP) server over stdio.
     #[command(name = "mcp")]
-    Mcp {
-        /// Optional target language to proxy directly to, otherwise acts as a unified orchestrator
-        target_language: Option<String>,
-    },
+    Mcp { target_language: Option<String> },
 }
 
 #[actix_web::main]
@@ -110,11 +81,9 @@ async fn main() -> std::io::Result<()> {
             } else {
                 format!("cdd-{}", target_language)
             };
-
             let mut cmd = Command::new(&target);
             cmd.arg("to_docs_json");
             cmd.arg("-i").arg(&input);
-
             if no_imports {
                 cmd.arg("--no-imports");
             }
@@ -131,7 +100,6 @@ async fn main() -> std::io::Result<()> {
                 std::io::Write::write_all(&mut std::io::stderr(), &output.stderr)?;
                 std::process::exit(output.status.code().unwrap_or(1));
             }
-
             std::io::Write::write_all(&mut std::io::stdout(), &output.stdout)?;
             return Ok(());
         }
@@ -145,10 +113,8 @@ async fn main() -> std::io::Result<()> {
             } else {
                 format!("cdd-{}", target_language)
             };
-
             let mut cmd = Command::new(&executable);
-            cmd.arg("from_openapi");
-            cmd.arg(&target);
+            cmd.arg("from_openapi").arg(&target);
             for arg in extra_args {
                 cmd.arg(arg);
             }
@@ -162,7 +128,6 @@ async fn main() -> std::io::Result<()> {
                 std::io::Write::write_all(&mut std::io::stderr(), &output.stderr)?;
                 std::process::exit(output.status.code().unwrap_or(1));
             }
-
             std::io::Write::write_all(&mut std::io::stdout(), &output.stdout)?;
             return Ok(());
         }
@@ -175,7 +140,6 @@ async fn main() -> std::io::Result<()> {
             } else {
                 format!("cdd-{}", target_language)
             };
-
             let mut cmd = Command::new(&executable);
             cmd.arg("to_openapi");
             for arg in extra_args {
@@ -191,7 +155,6 @@ async fn main() -> std::io::Result<()> {
                 std::io::Write::write_all(&mut std::io::stderr(), &output.stderr)?;
                 std::process::exit(output.status.code().unwrap_or(1));
             }
-
             std::io::Write::write_all(&mut std::io::stdout(), &output.stdout)?;
             return Ok(());
         }
@@ -205,7 +168,6 @@ async fn main() -> std::io::Result<()> {
                 let mut cmd = Command::new(&executable);
                 cmd.arg("mcp");
 
-                // We use `exec` style proxying if possible, but spawn works too
                 let mut child = cmd.spawn().unwrap_or_else(|e| {
                     eprintln!("Failed to spawn {}: {}", executable, e);
                     std::process::exit(1);
@@ -213,8 +175,72 @@ async fn main() -> std::io::Result<()> {
                 let status = child.wait()?;
                 std::process::exit(status.code().unwrap_or(1));
             } else {
-                eprintln!("Unified MCP orchestrator not yet implemented. Use `cdd-ctl mcp <language>` for now.");
-                std::process::exit(1);
+                let mut app_config = match AppConfig::load(args.config.as_deref()) {
+                    Ok(c) => c,
+                    Err(e) => {
+                        error!("Failed to load configuration: {}", e);
+                        std::process::exit(1);
+                    }
+                };
+
+                if app_config.servers.is_empty() {
+                    let native_tools = [
+                        "cdd-c",
+                        "cdd-cpp",
+                        "cdd-csharp",
+                        "cdd-go",
+                        "cdd-java",
+                        "cdd-kotlin",
+                        "cdd-php",
+                        "cdd-python",
+                        "cdd-python-all",
+                        "cdd-ruby",
+                        "cdd-rust",
+                        "cdd-sh",
+                        "cdd-swift",
+                        "cdd-ts",
+                    ];
+                    for tool in native_tools {
+                        app_config.servers.insert(
+                            tool.to_string(),
+                            ProcessConfig {
+                                command: Some(tool.to_string()),
+                                args: Some(vec!["mcp".to_string()]),
+                                external_address: None,
+                                max_retries: 5,
+                                restart_delay_ms: 2000,
+                            },
+                        );
+                    }
+                }
+
+                let process_manager = Arc::new(ProcessManager::new(app_config.servers.clone()));
+                if let Err(e) = process_manager.start_all().await {
+                    error!("Error starting MCP processes: {}", e);
+                    std::process::exit(1);
+                }
+
+                let mut stdin_reader = BufReader::new(stdin()).lines();
+                let mut stdout_writer = stdout();
+
+                while let Ok(Some(line)) = stdin_reader.next_line().await {
+                    if let Ok(req) = serde_json::from_str::<McpRequest>(&line) {
+                        let response = process_manager.handle_request(req).await;
+                        let res_json = match response {
+                            Ok(res) => serde_json::to_string(&res).unwrap_or_default(),
+                            Err(e) => serde_json::to_string(&serde_json::json!({
+                                "jsonrpc": "2.0",
+                                "error": { "message": e.to_string() }
+                            }))
+                            .unwrap_or_default(),
+                        };
+                        let msg = format!("{}\n", res_json);
+                        let _ = stdout_writer.write_all(msg.as_bytes()).await;
+                    }
+                }
+
+                process_manager.stop_all().await;
+                return Ok(());
             }
         }
         None => {}
@@ -253,9 +279,9 @@ async fn main() -> std::io::Result<()> {
         for tool in native_tools {
             app_config.servers.insert(
                 tool.to_string(),
-                cdd_engine::daemon::ProcessConfig {
+                ProcessConfig {
                     command: Some(tool.to_string()),
-                    args: Some(vec!["serve_json_rpc".to_string()]),
+                    args: Some(vec!["mcp".to_string()]),
                     external_address: None,
                     max_retries: 5,
                     restart_delay_ms: 2000,
@@ -292,7 +318,6 @@ async fn main() -> std::io::Result<()> {
                 github_client.clone() as Arc<dyn GitHubClient>
             ))
             .configure(api::configure)
-            .service(api::swagger_ui())
     })
     .bind(&bind_addr)?
     .run();

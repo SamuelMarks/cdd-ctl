@@ -663,15 +663,34 @@ name = "cdd-ctl"
 version = "0.0.1"
 dependencies = [
  "actix-web",
- "cdd-engine",
+ "cdd-engine 0.0.1",
  "cdd-gateway",
  "clap",
  "dotenvy",
  "env_logger",
  "log",
  "serde",
+ "serde_json",
  "tokio",
  "utoipa",
+]
+
+[[package]]
+name = "cdd-engine"
+version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "config",
+ "derive_more 1.0.0",
+ "env_logger",
+ "log",
+ "once_cell",
+ "rquickjs",
+ "serde",
+ "serde_json",
+ "tokio",
+ "wasmtime",
+ "wasmtime-wasi",
 ]
 
 [[package]]
@@ -704,7 +723,7 @@ dependencies = [
  "argon2",
  "async-trait",
  "base64 0.22.1",
- "cdd-engine",
+ "cdd-engine 0.0.1 (git+https://github.com/SamuelMarks/cdd-engine)",
  "chrono",
  "clap",
  "config",

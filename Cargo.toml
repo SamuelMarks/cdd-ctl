@@ -4,7 +4,7 @@ version = "0.0.1"
 edition = "2021"
 
 [dependencies]
-cdd-engine = { git = "https://github.com/SamuelMarks/cdd-engine" }
+cdd-engine = { path = "../cdd-engine" }
 cdd-gateway = { git = "https://github.com/SamuelMarks/cdd-gateway" }
 
 serde = { version = "1.0", features = ["derive"] }
@@ -15,6 +15,7 @@ clap = { version = "4.6.1", features = ["derive"] }
 actix-web = "4"
 dotenvy = "0.15"
 utoipa = "5.5.0"
+serde_json = "1.0.150"
 
 [lints.rust]
 unexpected_cfgs = { level = "allow", check-cfg = ['cfg(tarpaulin_include)'] }
