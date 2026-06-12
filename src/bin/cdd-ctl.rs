@@ -38,12 +38,8 @@ enum Commands {
     #[command(name = "to_docs_json")]
     ToDocsJson {
         target_language: String,
-        #[arg(short, long)]
-        input: String,
-        #[arg(long)]
-        no_imports: bool,
-        #[arg(long)]
-        no_wrapping: bool,
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        args: Vec<String>,
     },
     #[command(name = "from_openapi")]
     FromOpenApi {
@@ -72,9 +68,7 @@ async fn main() -> std::io::Result<()> {
     match args.command {
         Some(Commands::ToDocsJson {
             target_language,
-            input,
-            no_imports,
-            no_wrapping,
+            args: extra_args,
         }) => {
             let target = if target_language.starts_with("cdd-") {
                 target_language.clone()
@@ -83,12 +77,8 @@ async fn main() -> std::io::Result<()> {
             };
             let mut cmd = Command::new(&target);
             cmd.arg("to_docs_json");
-            cmd.arg("-i").arg(&input);
-            if no_imports {
-                cmd.arg("--no-imports");
-            }
-            if no_wrapping {
-                cmd.arg("--no-wrapping");
+            for arg in extra_args {
+                cmd.arg(arg);
             }
 
             let output = cmd.output().unwrap_or_else(|e| {

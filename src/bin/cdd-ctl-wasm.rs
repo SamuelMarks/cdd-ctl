@@ -45,17 +45,9 @@ enum Commands {
         /// Target language
         target_language: String,
 
-        /// Path or URL to the OpenAPI specification.
-        #[arg(short, long)]
-        input: String,
-
-        /// Omit the imports field.
-        #[arg(long)]
-        no_imports: bool,
-
-        /// Omit the wrapper fields.
-        #[arg(long)]
-        no_wrapping: bool,
+        /// Additional arguments to pass to the tool
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        args: Vec<String>,
     },
 
     /// Generate code from an OpenAPI specification.
@@ -95,9 +87,7 @@ async fn main() -> std::io::Result<()> {
     match args.command {
         Some(Commands::ToDocsJson {
             target_language,
-            input,
-            no_imports,
-            no_wrapping,
+            args: extra_args,
         }) => {
             let target = if target_language.starts_with("cdd-") {
                 target_language.clone()
@@ -114,33 +104,15 @@ async fn main() -> std::io::Result<()> {
 
             let wasm_file = format!("cdd-ctl-wasm-sdk/assets/wasm/{}.wasm", target);
 
-            // Make input accessible to WASI
-            let input_path = std::path::Path::new(&input)
-                .canonicalize()
-                .unwrap_or_else(|_| std::path::PathBuf::from(&input));
-            let input_dir = input_path.parent();
-            let filename = input_path
-                .file_name()
-                .map(|f| f.to_string_lossy().to_string())
-                .unwrap_or_default();
-            if let Some(d) = input_dir {
-                cmd.arg(format!("--dir={}::/workspace", d.display()));
-            } else {
-                cmd.arg("--dir=.::/workspace");
-            }
+            cmd.arg("--dir=."); // Mount current dir
 
             cmd.arg(&wasm_file);
 
             // Pass arguments to WASM binary
             cmd.arg("--");
             cmd.arg("to_docs_json");
-            cmd.arg("-i").arg(format!("/workspace/{}", filename));
-
-            if no_imports {
-                cmd.arg("--no-imports");
-            }
-            if no_wrapping {
-                cmd.arg("--no-wrapping");
+            for arg in extra_args {
+                cmd.arg(arg);
             }
 
             let output = cmd.output().unwrap_or_else(|e| {
